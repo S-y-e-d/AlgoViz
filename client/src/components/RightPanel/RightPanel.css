@@ -1,0 +1,14 @@
+#right-panel {
+    height: 100%;
+}
+.right-panel-content {
+    max-height: 100%;
+    white-space: pre-wrap;
+    /* preserves spaces & line breaks, wraps long lines */
+    font-family: monospace;
+    font-size: 1.2em;
+    line-height: 2;
+    color: var(--text-color);
+    padding: 12px;
+    overflow-y: auto;
+}

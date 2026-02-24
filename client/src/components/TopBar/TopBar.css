@@ -1,0 +1,14 @@
+#top-bar {
+    display: grid;
+    grid-template-columns: 9fr 1fr 1fr 1fr;
+    column-gap: 20px;
+    padding: 0 20px;
+    align-content: center;
+
+    height: 100%;
+} 
+
+#top-bar > header {
+    display: flex;
+    align-items: center;
+}

@@ -1,0 +1,20 @@
+:root {
+  --bg-page: #151515;
+  --bg-layout: #101010;
+  --bg-panel: #101010;
+  --bg-bar: #202020;
+  --bg-scroll-hover: #ffffff;
+  --bg-scroll: #999999;
+
+  --border-color: #303030;
+  --text-color: #AAAAAA;
+
+}
+
+.light {
+  --bg-page: white;
+  --bg-layout: #FAFAFA;
+  --bg-panel: #F5F5F5;
+  --bg-bar: #F0F0F0;
+  --text-color: black;
+}
