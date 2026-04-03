@@ -1,0 +1,32 @@
+.home-page {
+
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  justify-items: center;
+
+  background-color: var(--bg-page);
+  color: var(--text-color)
+}
+
+.home-page header {
+    font-size: 5em;
+}
+
+.cards {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+a:visited {
+    color: inherit;
+}

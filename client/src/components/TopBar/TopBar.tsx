@@ -12,7 +12,7 @@ export function TopBar() {
             <Button text="Help" icon={<HelpIcon className="icon" />} className="top-bar-button"/>
             {/* <div id="reset-button"> <ResetIcon className="icon"/> Reset </div> */}
             {/* <div id="theme-button"> <DarkModeIcon className="icon"/> Theme </div> */}
-            <img src="" />
+            {/* <img src="" /> */}
         </div>
     )
 }
