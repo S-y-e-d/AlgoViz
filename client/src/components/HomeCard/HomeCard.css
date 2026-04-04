@@ -1,0 +1,37 @@
+.home-card {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;;
+
+    width: 25%;
+    height: 25%;
+
+    padding: 20px;
+
+    vertical-align: middle;
+    object-fit: contain;
+
+    background-color: var(--bg-bar);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+
+    cursor: pointer;
+}
+
+.home-card p {
+    text-align: center;
+}
+
+.home-card:hover {
+    background-color: var(--bg-panel);
+    box-shadow: 2px 2px 10px rgba(64, 64, 64, 1);
+}
+
+.card-image {
+    width: 50%;
+    height: 50%;
+}
+
+

@@ -5,7 +5,7 @@ import {RightPanel} from "../components/RightPanel/RightPanel.tsx";
 import {TopBar} from "../components/TopBar/TopBar.tsx"
 import {BottomBar} from "../components/BottomBar/BottomBar.tsx"
 
-function VisualizerPage() {
+export const VisualizerPage = () => {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
@@ -30,5 +30,3 @@ function VisualizerPage() {
     </div>
   )
 }
-
-export default VisualizerPage;

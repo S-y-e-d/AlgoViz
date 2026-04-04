@@ -1,3 +1,4 @@
+@import "../components/HomeCard/HomeCard.css";
 .home-page {
 
   min-height: 100vh;
@@ -17,16 +18,11 @@
     font-size: 5em;
 }
 
-.cards {
+.cards-container {
     display: flex;
     flex-direction: row;
+    justify-content: center;
     gap: 2rem;
-}
 
-a {
-    color: inherit;
-    text-decoration: none;
-}
-a:visited {
-    color: inherit;
+    margin-top: 50px;
 }
