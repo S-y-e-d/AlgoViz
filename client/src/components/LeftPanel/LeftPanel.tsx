@@ -1,24 +1,53 @@
 import { useState } from "react"
 import { Button } from "../Button/Button"
+import type { StructureType } from "../../App";
 
-export function LeftPanel() {
+type LeftPanelProps = {
+    onDataChange: (data: number[]) => void;
+    structure: StructureType;
+    setStructure: (structure: StructureType) => void;
+};
+
+export function LeftPanel({ onDataChange, structure, setStructure }: LeftPanelProps) {
 
     const [sizeSliderValue, setSizeSliderValue] = useState<number>(3);
     const handleSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSizeSliderValue(Number(e.target.value));
     };
 
+    const [dataInput, setDataInput] = useState("");
+
+    function handleDataChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.value;
+        setDataInput(value);
+
+        // convert "1,2,3" → [1,2,3]
+        const arr = value
+            .split(",")
+            .map(v => parseInt(v.trim()));
+            // .filter(v => !isNaN(v));
+
+        onDataChange(arr);
+    }
 
     return (
         <div id="left-panel" className="panel">
             <div className="bar panel-bar" id="left-panel-bar">Controls</div>
             <div className="left-panel-content panel-content">
                 <span>Data Structure</span>
-                <select name="struct-select" id="struct-select" className="dropdown">
+                <select name="struct-select"
+                    id="struct-select"
+                    className="dropdown"
+                    value={structure}
+                    onChange={
+                        (e) => {
+                            setStructure(e.target.value as StructureType)
+                        }}>
                     <option value="array">Array</option>
-                    <option value="linked list">Linked List</option>
-                    <option value="stack">Stack</option>
-                    <option value="queue">Queue</option>
+                    <option value="list">Linked List</option>
+                    <option value="stack" disabled>Stack</option>
+                    <option value="queue" disabled>Queue</option>
+                    <option value="tree">Tree</option>
                 </select>
 
                 <span>Algorithm</span>
@@ -32,7 +61,7 @@ export function LeftPanel() {
                 <hr />
 
                 <div className="input-field">
-                    <label>Value</label> <input className="input" type="number" name="array-value" id="array-value" />
+                    <label>Data</label> <input className="input" name="array-value" id="array-value" value={dataInput} onChange={handleDataChange} />
                     <label>Index</label> <input className="input" type="number" name="array-index" id="array-index" />
                 </div>
                 <div className="left-panel-button-container">

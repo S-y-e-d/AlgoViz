@@ -1,0 +1,15 @@
+#center-panel svg rect,circle {
+    fill: none;
+    stroke: var(--svg-stroke);
+    stroke-width: 2px;
+}
+
+#center-panel svg line,marker {
+    fill: var(--svg-stroke);
+    stroke: var(--svg-stroke);
+    stroke-width: 2px;
+}
+
+#center-panel svg text {
+    fill: var(--svg-text);
+}

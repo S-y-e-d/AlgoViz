@@ -3,11 +3,15 @@
   --bg-layout: #101010;
   --bg-panel: #101010;
   --bg-bar: #202020;
+
   --bg-scroll-hover: #ffffff;
   --bg-scroll: #999999;
 
   --border-color: #303030;
-  --text-color: #AAAAAA;
+  --text-color: #ccc;
+
+  --svg-stroke: #fff;
+  --svg-text: #ccc;
 
 }
 
@@ -16,5 +20,13 @@
   --bg-layout: #FAFAFA;
   --bg-panel: #F5F5F5;
   --bg-bar: #F0F0F0;
-  --text-color: black;
+
+  --bg-scroll-hover: #000000;
+  --bg-scroll: #999999;
+
+  --border-color: #303030;
+  --text-color: #AAAAAA;
+
+  --svg-stroke: #000;
+  --svg-text: #000;
 }

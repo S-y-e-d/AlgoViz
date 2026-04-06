@@ -12,6 +12,8 @@
 @import "./pages/VisualizerPage.css";
 @import "./pages/HomePage.css";
 
+@import "./components/SVGViews/SVGViews.css";
+
 *,
 *::before,
 *::after {
