@@ -3,9 +3,15 @@ import { VisualizerPage } from "./pages/VisualizerPage";
 import { HomePage } from "./pages/HomePage";
 
 export type StructureType = "array" | "list" | "tree";
+export type GetElementByIndex = (index: number) => SVGGElement | null;
+
+type NodeRefs = {
+  current: Map<number, SVGGElement>;
+};
 export type ViewProps = {
   size: number;
   data: number[];
+  nodeRefs: NodeRefs;
 };
 
 function App() {

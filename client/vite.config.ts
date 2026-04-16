@@ -4,6 +4,7 @@ import svgr from "vite-plugin-svgr"
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "./",  // set relative path for when loading page statically
   plugins: [react(), svgr()],
   server: {
     host: true,        // <-- allows access from any host

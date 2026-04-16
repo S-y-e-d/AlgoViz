@@ -1,11 +1,12 @@
 import type { ViewProps } from "../../App";
 
 export const ListView = ({ size, data }: ViewProps) => {
+    const dataCopy = data.filter(v => !isNaN(v));
     return (
         <>
             {
-                data.map((value, index) => {
-                    const structureSize = (2*data.length-1) * size ;
+                dataCopy.map((value, index) => {
+                    const structureSize = (2*dataCopy.length-1) * size ;
                     const structureStart = (1000-structureSize)/2;
                     const x = structureStart+ 2*size * index + size/2;
                     const y = (1000) / 2;
@@ -26,7 +27,7 @@ export const ListView = ({ size, data }: ViewProps) => {
                             >
                                 {value}
                             </text>
-                            {index < data.length - 1 && <line x1={x+size/2}
+                            {index < dataCopy.length - 1 && <line x1={x+size/2}
                             y1={y}
                             x2={x+3*size/2}
                             y2={y}
