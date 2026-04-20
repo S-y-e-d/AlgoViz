@@ -11,8 +11,10 @@ import { bubbleSort } from "../../animations/array/sorting";
 type CenterPanelProps = {
   data: number[];
   structure: StructureType;
+  isAnimating: boolean;
+  setIsAnimating: (bool: boolean) => void;
 }
-export function CenterPanel({ data, structure }: CenterPanelProps) {
+export function CenterPanel({ data, structure, isAnimating, setIsAnimating }: CenterPanelProps) {
 
   const nodeRefs = useRef<Map<number, SVGGElement>>(new Map());
 
@@ -23,22 +25,33 @@ export function CenterPanel({ data, structure }: CenterPanelProps) {
   } satisfies Record<StructureType, React.FC<ViewProps>>;
   const ViewComponent = structureMap[structure];
 
+  const isAnimatingRef = useRef<boolean>(isAnimating);
+
+  // temporary trigger
   useEffect(() => {
-  const handler = (e: KeyboardEvent) => {
-    if (e.key === "s") {
-      bubbleSort(
-        [...data.filter(v => !isNaN(v))],
-        (i) => nodeRefs.current.get(i) ?? null
-      );
-    }
-  };
+    const handler = async (e: KeyboardEvent) => {
+      if (e.key === "s") {
+        if (isAnimatingRef.current) return;
+        isAnimatingRef.current = true;
+        setIsAnimating(true);
+        try {
+          await bubbleSort(
+            [...data.filter(v => !isNaN(v))],
+            (i) => nodeRefs.current.get(i) ?? null
+          );
+        } finally {
+          isAnimatingRef.current = false;
+          setIsAnimating(false);
+        }
+      }
+    };
 
-  window.addEventListener("keydown", handler);
+    window.addEventListener("keydown", handler);
 
-  return () => {
-    window.removeEventListener("keydown", handler);
-  };
-}, [data]);
+    return () => {
+      window.removeEventListener("keydown", handler);
+    };
+  }, [data, isAnimatingRef, setIsAnimating]);
 
   const size = 100;
   return (
@@ -63,6 +76,14 @@ export function CenterPanel({ data, structure }: CenterPanelProps) {
           >
             <path d="M 0 0 L 10 5 L 0 10 z" />
           </marker>
+          {/* change the stdDeviation to control glow strength */}
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
         {/* <ArrayView size={100} data={data} /> */}
         <ViewComponent size={size} data={data} nodeRefs={nodeRefs} />

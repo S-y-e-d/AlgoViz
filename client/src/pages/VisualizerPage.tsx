@@ -20,6 +20,8 @@ export const VisualizerPage = () => {
   const [data, setData] = useState<number[]>([]);
 
   const [structure, setStructure] = useState<StructureType>("array");
+  
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // return <h1>{msg}</h1>;
   return (
@@ -27,8 +29,8 @@ export const VisualizerPage = () => {
       <div className="layout">
         <div className="top"><TopBar /></div>
         <div className="middle">
-          <div className="left-panel"><LeftPanel onDataChange={setData} structure={structure} setStructure={setStructure}/></div>
-          <div className="center-panel"><CenterPanel data={data} structure={structure}/></div>
+          <div className="left-panel"><LeftPanel onDataChange={setData} structure={structure} setStructure={setStructure} isAnimating={isAnimating}/></div>
+          <div className="center-panel"><CenterPanel data={data} structure={structure} isAnimating={isAnimating} setIsAnimating={setIsAnimating}/></div>
           <div className="right-panel"><RightPanel /></div>
         </div>
         <div className="bottom"><BottomBar /></div>

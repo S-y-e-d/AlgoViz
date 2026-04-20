@@ -1,12 +1,8 @@
-import { useEffect } from "react";
 import type { ViewProps } from "../../App";
 
 export const ArrayView = ({ size, data, nodeRefs }: ViewProps) => {
   // need to filter out NaN used as null for non linear structures
   const dataCopy = data.filter(v => !isNaN(v));
-  useEffect(() => {
-    nodeRefs.current.clear();
-  });
   return (
     <>
       {
@@ -20,7 +16,10 @@ export const ArrayView = ({ size, data, nodeRefs }: ViewProps) => {
           );
           return (
             <g key={index} ref={(el) => {
-              if (el) nodeRefs.current.set(index, el);
+              if (el) 
+                nodeRefs.current.set(index, el); 
+              else 
+                nodeRefs.current.delete(index);
             }}>
               <rect x={x} y={y} width={size} height={size} />
               <text

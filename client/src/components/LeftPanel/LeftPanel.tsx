@@ -6,9 +6,10 @@ type LeftPanelProps = {
     onDataChange: (data: number[]) => void;
     structure: StructureType;
     setStructure: (structure: StructureType) => void;
+    isAnimating: boolean;
 };
 
-export function LeftPanel({ onDataChange, structure, setStructure }: LeftPanelProps) {
+export function LeftPanel({ onDataChange, structure, setStructure, isAnimating}: LeftPanelProps) {
 
     const [sizeSliderValue, setSizeSliderValue] = useState<number>(3);
     const handleSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +62,7 @@ export function LeftPanel({ onDataChange, structure, setStructure }: LeftPanelPr
                 <hr />
 
                 <div className="input-field">
-                    <label>Data</label> <input className="input" name="array-value" id="array-value" value={dataInput} onChange={handleDataChange} />
+                    <label>Data</label> <input className="input" name="array-value" id="array-value" value={dataInput} onChange={handleDataChange} disabled={isAnimating}/>
                     <label>Index</label> <input className="input" type="number" name="array-index" id="array-index" />
                 </div>
                 <div className="left-panel-button-container">
