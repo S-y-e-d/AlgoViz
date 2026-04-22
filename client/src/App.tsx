@@ -4,13 +4,17 @@ import { HomePage } from "./pages/HomePage";
 
 export type StructureType = "array" | "list" | "tree";
 export type GetElementByIndex = (index: number) => SVGGElement | null;
+export type DataItem = {
+  val: number,
+  id: string,
+}
 
 type NodeRefs = {
   current: Map<number, SVGGElement>;
 };
 export type ViewProps = {
   size: number;
-  data: number[];
+  data: DataItem[];
   nodeRefs: NodeRefs;
 };
 

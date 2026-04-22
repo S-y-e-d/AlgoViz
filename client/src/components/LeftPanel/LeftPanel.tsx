@@ -15,8 +15,11 @@ export function LeftPanel({ onDataChange, structure, setStructure, isAnimating}:
     const handleSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSizeSliderValue(Number(e.target.value));
     };
+    // temporary default data input
+      const tempData = [6,3,4,1,8,7,2,5];
+    const [dataInput, setDataInput] = useState(tempData.join(","));
 
-    const [dataInput, setDataInput] = useState("");
+    
 
     function handleDataChange(e: React.ChangeEvent<HTMLInputElement>) {
         const value = e.target.value;
@@ -26,7 +29,6 @@ export function LeftPanel({ onDataChange, structure, setStructure, isAnimating}:
         const arr = value
             .split(",")
             .map(v => parseInt(v.trim()));
-            // .filter(v => !isNaN(v));
 
         onDataChange(arr);
     }

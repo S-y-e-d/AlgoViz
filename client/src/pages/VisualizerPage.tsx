@@ -4,7 +4,7 @@ import { CenterPanel } from "../components/CenterPanel/CenterPanel.tsx";
 import { RightPanel } from "../components/RightPanel/RightPanel.tsx";
 import { TopBar } from "../components/TopBar/TopBar.tsx"
 import { BottomBar } from "../components/BottomBar/BottomBar.tsx"
-import type { StructureType } from "../App.tsx";
+import type { DataItem, StructureType } from "../App.tsx";
 
 export const VisualizerPage = () => {
   const [msg, setMsg] = useState("");
@@ -17,10 +17,20 @@ export const VisualizerPage = () => {
   console.log(msg);
 
   // input box data to set the middle structure values 
-  const [data, setData] = useState<number[]>([]);
+  // const [data, setData] = useState<DataItem[]>([6,3,4,1,8,7,2,5]);
+  const [data, setData] = useState<DataItem[]>([]);
+
+  const onDataChange = (array: number[]) => {
+    setData([]);
+    const items: DataItem[] = array.map((n) => ({
+      id: crypto.randomUUID(),
+      val: n,
+    }));
+    setData(items);
+  }
 
   const [structure, setStructure] = useState<StructureType>("array");
-  
+
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // return <h1>{msg}</h1>;
@@ -29,8 +39,8 @@ export const VisualizerPage = () => {
       <div className="layout">
         <div className="top"><TopBar /></div>
         <div className="middle">
-          <div className="left-panel"><LeftPanel onDataChange={setData} structure={structure} setStructure={setStructure} isAnimating={isAnimating}/></div>
-          <div className="center-panel"><CenterPanel data={data} structure={structure} isAnimating={isAnimating} setIsAnimating={setIsAnimating}/></div>
+          <div className="left-panel"><LeftPanel onDataChange={onDataChange} structure={structure} setStructure={setStructure} isAnimating={isAnimating} /></div>
+          <div className="center-panel"><CenterPanel data={data} structure={structure} isAnimating={isAnimating} setIsAnimating={setIsAnimating} /></div>
           <div className="right-panel"><RightPanel /></div>
         </div>
         <div className="bottom"><BottomBar /></div>

@@ -2,14 +2,14 @@ import { ArrayView } from "../SVGViews/ArrayView";
 import { ListView } from "../SVGViews/ListView";
 import { TreeView } from "../SVGViews/TreeView";
 
-import type { StructureType } from "../../App";
+import type { DataItem, StructureType } from "../../App";
 import type { ViewProps } from "../../App";
 import { useEffect, useRef } from "react";
-import { bubbleSort } from "../../animations/array/sorting";
+import { bubbleSortTL } from "../../animations/array/sorting";
 
 
 type CenterPanelProps = {
-  data: number[];
+  data: DataItem[];
   structure: StructureType;
   isAnimating: boolean;
   setIsAnimating: (bool: boolean) => void;
@@ -35,10 +35,11 @@ export function CenterPanel({ data, structure, isAnimating, setIsAnimating }: Ce
         isAnimatingRef.current = true;
         setIsAnimating(true);
         try {
-          await bubbleSort(
-            [...data.filter(v => !isNaN(v))],
+          const tl = bubbleSortTL(
+            [...data.filter(v => !isNaN(v.val))],
             (i) => nodeRefs.current.get(i) ?? null
           );
+          tl.play();
         } finally {
           isAnimatingRef.current = false;
           setIsAnimating(false);
