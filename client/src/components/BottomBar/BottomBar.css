@@ -1,7 +1,21 @@
 #bottom-bar {
-    align-content: center;
-    justify-items:center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5em;
 
     border-radius: 0 0 20px 20px;
     height: 100%;
+}
+
+
+.control-button {
+    height: 100%;
+    stroke: var(--border-color);
+    stroke-width: 2px;
+
+}
+
+.bottom-bar-button {
+    height: 50%;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LeftPanel } from "../components/LeftPanel/LeftPanel.tsx";
 import { CenterPanel } from "../components/CenterPanel/CenterPanel.tsx";
 import { RightPanel } from "../components/RightPanel/RightPanel.tsx";
@@ -17,7 +17,6 @@ export const VisualizerPage = () => {
   console.log(msg);
 
   // input box data to set the middle structure values 
-  // const [data, setData] = useState<DataItem[]>([6,3,4,1,8,7,2,5]);
   const [data, setData] = useState<DataItem[]>([]);
 
   const onDataChange = (array: number[]) => {
@@ -33,6 +32,13 @@ export const VisualizerPage = () => {
 
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
+  // #TODO - Callbacks in the timeline to check for this reference
+  const isTLPaused = useRef<boolean>(true);
+  const toggleTLPause = () => {
+    isTLPaused.current = !isTLPaused.current;
+    console.log(isTLPaused.current)
+  }
+
   // return <h1>{msg}</h1>;
   return (
     <div className="visualizer-page">
@@ -43,7 +49,7 @@ export const VisualizerPage = () => {
           <div className="center-panel"><CenterPanel data={data} structure={structure} isAnimating={isAnimating} setIsAnimating={setIsAnimating} /></div>
           <div className="right-panel"><RightPanel /></div>
         </div>
-        <div className="bottom"><BottomBar /></div>
+        <div className="bottom"><BottomBar toggleTLPause={toggleTLPause} /></div>
       </div>
     </div>
   )
