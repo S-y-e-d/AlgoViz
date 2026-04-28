@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import type { DataItem, GetElementByIndex } from "../../App";
+import type { RefObject } from "react";
 
 class MissingElementError extends Error {
     constructor(message: string) {
@@ -19,6 +20,7 @@ const getHighlightOverlay = (el: SVGElement): SVGRectElement => {
     const overlay = rect.cloneNode(false) as SVGRectElement;
 
     overlay.setAttribute("fill", "none");
+    overlay.setAttribute("stroke-opacity", "0");
     overlay.setAttribute("pointer-events", "none");
 
     const x = parseFloat(rect.getAttribute("x") || "0");
@@ -88,13 +90,16 @@ const compareGTTL = (
     i: number,
     j: number,
     array: DataItem[],
-    getEl: GetElementByIndex
+    getEl: GetElementByIndex,
+    isTLPaused: RefObject<boolean>,
 ) => {
     const isGreater = array[i].val > array[j].val;
-    const color = isGreater ? "green" : "red";
+    const color = isGreater ? "red" : "green";
 
     const o1 = highlightTL(tl, i, getEl, color);
     const o2 = highlightTL(tl, j, getEl, color, "<");
+
+    tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
 
     // delay
     tl.to({}, { duration: 0.25 });
@@ -110,6 +115,7 @@ const swapTL = (
     j: number,
     getEl: GetElementByIndex,
     tl: GSAPTimeline,
+    isTLPaused: RefObject<boolean>,
 ) => {
     const el1 = getEl(i);
     if (!el1)
@@ -147,11 +153,15 @@ const swapTL = (
     tl.call(() => {
         [txt1.textContent, txt2.textContent] = [txt2.textContent, txt1.textContent];
     })
+    tl.call(() => { if (isTLPaused.current === true) tl.pause(); }
+    )
+
 }
 
 export const bubbleSortTL = (
     array: DataItem[],
-    getEl: GetElementByIndex
+    getEl: GetElementByIndex,
+    isTLPaused: RefObject<boolean>
 ) => {
     const tl = gsap.timeline();
 
@@ -164,18 +174,17 @@ export const bubbleSortTL = (
 
             // wait
             tl.to({}, { duration: 0.25 });
+            tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
 
-            const isGT = compareGTTL(tl, j, j + 1, array, getEl);
+            const isGT = compareGTTL(tl, j, j + 1, array, getEl, isTLPaused);
             if (isGT) {
-                swapTL(j, j + 1, getEl, tl);
+                swapTL(j, j + 1, getEl, tl, isTLPaused);
                 [array[j], array[j + 1]] = [array[j + 1], array[j]];
             }
 
             removeOverlayTL(tl, o1);
             removeOverlayTL(tl, o2, "<");
 
-            // gap
-            // tl.to({}, { duration: 0.5 });
         }
     }
 

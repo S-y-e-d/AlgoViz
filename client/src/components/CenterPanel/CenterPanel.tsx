@@ -4,19 +4,18 @@ import { TreeView } from "../SVGViews/TreeView";
 
 import type { DataItem, StructureType } from "../../App";
 import type { ViewProps } from "../../App";
-import { useEffect, useRef } from "react";
-import { bubbleSortTL } from "../../animations/array/sorting";
-
 
 type CenterPanelProps = {
   data: DataItem[];
   structure: StructureType;
-  isAnimating: boolean;
-  setIsAnimating: (bool: boolean) => void;
+  nodeRefs: React.RefObject<Map<number, SVGGElement>>;
 }
-export function CenterPanel({ data, structure, isAnimating, setIsAnimating }: CenterPanelProps) {
+export function CenterPanel({
+  data,
+  structure,
+  nodeRefs,
+}: CenterPanelProps) {
 
-  const nodeRefs = useRef<Map<number, SVGGElement>>(new Map());
 
   const structureMap = {
     array: ArrayView,
@@ -25,34 +24,6 @@ export function CenterPanel({ data, structure, isAnimating, setIsAnimating }: Ce
   } satisfies Record<StructureType, React.FC<ViewProps>>;
   const ViewComponent = structureMap[structure];
 
-  const isAnimatingRef = useRef<boolean>(isAnimating);
-
-  // temporary trigger
-  useEffect(() => {
-    const handler = async (e: KeyboardEvent) => {
-      if (e.key === "s") {
-        if (isAnimatingRef.current) return;
-        isAnimatingRef.current = true;
-        setIsAnimating(true);
-        try {
-          const tl = bubbleSortTL(
-            [...data.filter(v => !isNaN(v.val))],
-            (i) => nodeRefs.current.get(i) ?? null
-          );
-          tl.play();
-        } finally {
-          isAnimatingRef.current = false;
-          setIsAnimating(false);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handler);
-
-    return () => {
-      window.removeEventListener("keydown", handler);
-    };
-  }, [data, isAnimatingRef, setIsAnimating]);
 
   const size = 100;
   return (

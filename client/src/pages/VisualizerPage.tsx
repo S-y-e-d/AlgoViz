@@ -19,6 +19,11 @@ export const VisualizerPage = () => {
   // input box data to set the middle structure values 
   const [data, setData] = useState<DataItem[]>([]);
 
+  const refreshData = () => {
+    const temp = data.map((item) => item.val);
+    onDataChange(temp);
+  }
+
   const onDataChange = (array: number[]) => {
     setData([]);
     const items: DataItem[] = array.map((n) => ({
@@ -30,26 +35,45 @@ export const VisualizerPage = () => {
 
   const [structure, setStructure] = useState<StructureType>("array");
 
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  // #TODO - Callbacks in the timeline to check for this reference
+
+  const nodeRefs = useRef<Map<number, SVGGElement>>(new Map());
+
+  
   const isTLPaused = useRef<boolean>(true);
-  const toggleTLPause = () => {
-    isTLPaused.current = !isTLPaused.current;
-    console.log(isTLPaused.current)
+  const setTLPaused = (b: boolean) => {
+    isTLPaused.current = b;
+    console.log(isTLPaused.current);
   }
 
-  // return <h1>{msg}</h1>;
   return (
     <div className="visualizer-page">
       <div className="layout">
         <div className="top"><TopBar /></div>
         <div className="middle">
-          <div className="left-panel"><LeftPanel onDataChange={onDataChange} structure={structure} setStructure={setStructure} isAnimating={isAnimating} /></div>
-          <div className="center-panel"><CenterPanel data={data} structure={structure} isAnimating={isAnimating} setIsAnimating={setIsAnimating} /></div>
+          <div className="left-panel">
+            <LeftPanel
+              onDataChange={onDataChange}
+              structure={structure}
+              setStructure={setStructure}
+            />
+          </div>
+          <div className="center-panel">
+            <CenterPanel
+              data={data}
+              structure={structure}
+              nodeRefs={nodeRefs}
+            /></div>
           <div className="right-panel"><RightPanel /></div>
         </div>
-        <div className="bottom"><BottomBar toggleTLPause={toggleTLPause} /></div>
+        <div className="bottom">
+          <BottomBar
+            data={data}
+            nodeRefs={nodeRefs}
+            isTLPaused={isTLPaused}
+            setTLPaused={setTLPaused}
+            refreshData={refreshData}
+          /></div>
       </div>
     </div>
   )
