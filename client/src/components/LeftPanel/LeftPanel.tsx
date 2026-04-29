@@ -1,24 +1,26 @@
 import { useState } from "react"
 import { Button } from "../Button/Button"
-import type { StructureType } from "../../App";
+import type { AlgoType, StructureType } from "../../App";
 
 type LeftPanelProps = {
     onDataChange: (data: number[]) => void;
     structure: StructureType;
     setStructure: (structure: StructureType) => void;
+    algorithm: AlgoType;
+    setAlgorithm: (algo: AlgoType) => void;
 };
 
-export function LeftPanel({ onDataChange, structure, setStructure, }: LeftPanelProps) {
+export function LeftPanel({ onDataChange, structure, setStructure, algorithm, setAlgorithm }: LeftPanelProps) {
 
     const [sizeSliderValue, setSizeSliderValue] = useState<number>(3);
     const handleSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSizeSliderValue(Number(e.target.value));
     };
     // temporary default data input
-      const tempData = [6,3,4,1,8,7,2,5];
-    const [dataInput, setDataInput] = useState(tempData.join(","));
+    // const tempData = [6, 3, 4, 1, 8, 7, 2, 5];
+    const [dataInput, setDataInput] = useState("");
 
-    
+
 
     function handleDataChange(e: React.ChangeEvent<HTMLInputElement>) {
         const value = e.target.value;
@@ -32,6 +34,36 @@ export function LeftPanel({ onDataChange, structure, setStructure, }: LeftPanelP
         onDataChange(arr);
     }
 
+    let targetValue = null;
+    const targetValueAlgorithms = ["insertion", "binary-search", "linear-search"];
+    if (targetValueAlgorithms.includes(algorithm)) {
+        targetValue = <input className="input" type="number" name="target-value" id="target-value" placeholder="Value" />;
+    }
+    let targetIndex = null;
+    const targetIndexAlgorithms = ["deletion", "insertion",];
+    if (targetIndexAlgorithms.includes(algorithm)) {
+        targetIndex = <input className="input" type="number" name="target-index" id="target-index" placeholder="Index" />
+    }
+
+    const [randomSize, setRandomSize] = useState<number>(0);
+    const randomizeData = () => {
+
+        const arr = Array.from({ length: randomSize }, (_, i) => i + 1);
+        // Fisher–Yates shuffle
+        for (let i = randomSize - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        setDataInput(arr.join(","));
+        onDataChange(arr);
+
+    }
+
+    const clearData = () => {
+        setDataInput("");
+        onDataChange([]);
+    }
+
     return (
         <div id="left-panel" className="panel">
             <div className="bar panel-bar" id="left-panel-bar">Controls</div>
@@ -41,10 +73,7 @@ export function LeftPanel({ onDataChange, structure, setStructure, }: LeftPanelP
                     id="struct-select"
                     className="dropdown"
                     value={structure}
-                    onChange={
-                        (e) => {
-                            setStructure(e.target.value as StructureType)
-                        }}>
+                    onChange={(e) => setStructure(e.target.value as StructureType)}>
                     <option value="array">Array</option>
                     <option value="list">Linked List</option>
                     <option value="stack" disabled>Stack</option>
@@ -53,31 +82,46 @@ export function LeftPanel({ onDataChange, structure, setStructure, }: LeftPanelP
                 </select>
 
                 <span>Algorithm</span>
-                <select name="algo-select" id="algo-select" className="dropdown">
+                <select name="algo-select"
+                    id="algo-select"
+                    className="dropdown"
+                    value={algorithm}
+                    onChange={(e) => setAlgorithm(e.target.value as AlgoType)}
+                >
                     <option value="insertion">Insertion</option>
                     <option value="deletion">Deletion</option>
-                    <option value="linear search">Linear Search</option>
-                    <option value="binary search">Binary Search</option>
+                    <option value="linear-search">Linear Search</option>
+                    <option value="binary-search">Binary Search</option>
+                    <option value="bubble-sort">Bubble Sort</option>
                 </select>
 
                 <hr />
 
-                <div className="input-field">
-                    <label>Data</label> 
-                    <input 
-                    className="input" 
-                    name="array-value" 
-                    id="array-value" 
-                    value={dataInput} 
-                    onChange={handleDataChange} 
-                    // @TODO fix for data change when animating 
-                    disabled={false}/>      
-
-                    <label>Index</label> <input className="input" type="number" name="array-index" id="array-index" />
+                <div className="input-field-container">
+                    <input
+                        className="input"
+                        name="array-value"
+                        id="array-value"
+                        value={dataInput}
+                        onChange={handleDataChange}
+                        placeholder="Data"
+                    />
+                    <div className="optional-input-fields">
+                        {targetValue}
+                        {targetIndex}
+                    </div>
                 </div>
                 <div className="left-panel-button-container">
-                    <Button text="Insert" className="left-panel-button" />
-                    <Button className="left-panel-button" text="Random" /><Button className="left-panel-button" text="Clear" />
+                    <div className="random-container">
+                        <Button text="Randomize" className="left-panel-button" onClick={randomizeData}/>
+                        <input 
+                        type="number" 
+                        className="input" 
+                        placeholder="Size" 
+                        value={randomSize === 0 ? "" : randomSize} 
+                        onChange={e => setRandomSize(Number(e.target.value))}/>
+                    </div>
+                    <Button className="left-panel-button" text="Clear" onClick={clearData}/>
 
                 </div>
 

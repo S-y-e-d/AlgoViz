@@ -97,6 +97,8 @@ export function BottomBar({ data, nodeRefs, isTLPaused, setTLPaused, refreshData
   }
 
   const handleNextClick = () => {
+    tlPlayAnimateRef.current?.play();
+    setTLPaused(true);
     if (tlRef.current === null) {
       setAlgorhtm();
     }

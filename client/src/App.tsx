@@ -3,6 +3,7 @@ import { VisualizerPage } from "./pages/VisualizerPage";
 import { HomePage } from "./pages/HomePage";
 
 export type StructureType = "array" | "list" | "tree";
+export type AlgoType = "bubble-sort" | "insertion" | "deletion" | "binary-search";
 export type GetElementByIndex = (index: number) => SVGGElement | null;
 export type DataItem = {
   val: number,

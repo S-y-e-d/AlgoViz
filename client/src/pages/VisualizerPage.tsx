@@ -4,7 +4,7 @@ import { CenterPanel } from "../components/CenterPanel/CenterPanel.tsx";
 import { RightPanel } from "../components/RightPanel/RightPanel.tsx";
 import { TopBar } from "../components/TopBar/TopBar.tsx"
 import { BottomBar } from "../components/BottomBar/BottomBar.tsx"
-import type { DataItem, StructureType } from "../App.tsx";
+import { type AlgoType, type DataItem, type StructureType } from "../App.tsx";
 
 export const VisualizerPage = () => {
   const [msg, setMsg] = useState("");
@@ -33,7 +33,9 @@ export const VisualizerPage = () => {
     setData(items);
   }
 
+  // Input to select the structure
   const [structure, setStructure] = useState<StructureType>("array");
+  const [algorithm, setAlgoritm] = useState<AlgoType>("bubble-sort");
 
 
 
@@ -56,6 +58,8 @@ export const VisualizerPage = () => {
               onDataChange={onDataChange}
               structure={structure}
               setStructure={setStructure}
+              algorithm={algorithm}
+              setAlgorithm={setAlgoritm}
             />
           </div>
           <div className="center-panel">
