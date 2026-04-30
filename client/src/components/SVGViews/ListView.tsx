@@ -1,11 +1,11 @@
 import type { ViewProps } from "../../App";
 
 export const ListView = ({ size, data }: ViewProps) => {
-    const dataCopy = data.filter(v => !isNaN(v));
+    const dataCopy = data.filter(item => !isNaN(item.val));
     return (
         <>
             {
-                dataCopy.map((value, index) => {
+                dataCopy.map((item, index) => {
                     const structureSize = (2*dataCopy.length-1) * size ;
                     const structureStart = (1000-structureSize)/2;
                     const x = structureStart+ 2*size * index + size/2;
@@ -13,10 +13,10 @@ export const ListView = ({ size, data }: ViewProps) => {
 
                     const fontSize = Math.min(
                         size * 0.5,
-                        (size * 0.8) / String(value).length * 1.5
+                        (size * 0.8) / String(item.val).length * 1.5
                     );
                     return (
-                        <g key={index}>
+                        <g key={item.val}>
                             <circle r={size/2} cx={x} cy={y}/>
                             <text
                                 x={x }
@@ -25,7 +25,7 @@ export const ListView = ({ size, data }: ViewProps) => {
                                 dominantBaseline="middle"
                                 fontSize={fontSize}
                             >
-                                {value}
+                                {item.val}
                             </text>
                             {index < dataCopy.length - 1 && <line x1={x+size/2}
                             y1={y}

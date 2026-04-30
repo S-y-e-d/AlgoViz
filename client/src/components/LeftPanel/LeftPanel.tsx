@@ -4,23 +4,40 @@ import type { AlgoType, StructureType } from "../../App";
 
 type LeftPanelProps = {
     onDataChange: (data: number[]) => void;
+    valueData: number;
+    setValueData: (n: number) => void;
+    indexData: number;
+    setIndexData: (n: number) => void;
     structure: StructureType;
     setStructure: (structure: StructureType) => void;
     algorithm: AlgoType;
     setAlgorithm: (algo: AlgoType) => void;
+    setSize: (n: number) => void;
 };
 
-export function LeftPanel({ onDataChange, structure, setStructure, algorithm, setAlgorithm }: LeftPanelProps) {
+export function LeftPanel({ 
+    onDataChange,
+    valueData,
+    setValueData,
+    indexData,
+    setIndexData,
+    structure,
+    setStructure,
+    algorithm,
+    setAlgorithm,
+    setSize }: LeftPanelProps
+) {
 
     const [sizeSliderValue, setSizeSliderValue] = useState<number>(3);
     const handleSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSizeSliderValue(Number(e.target.value));
+        const size = Number(e.target.value);
+        setSizeSliderValue(size);
+        setSize(50 + size * 25);
     };
+
     // temporary default data input
     // const tempData = [6, 3, 4, 1, 8, 7, 2, 5];
     const [dataInput, setDataInput] = useState("");
-
-
 
     function handleDataChange(e: React.ChangeEvent<HTMLInputElement>) {
         const value = e.target.value;
@@ -34,23 +51,40 @@ export function LeftPanel({ onDataChange, structure, setStructure, algorithm, se
         onDataChange(arr);
     }
 
+
     let targetValue = null;
     const targetValueAlgorithms = ["insertion", "binary-search", "linear-search"];
     if (targetValueAlgorithms.includes(algorithm)) {
-        targetValue = <input className="input" type="number" name="target-value" id="target-value" placeholder="Value" />;
+        targetValue = <input
+            className="input"
+            type="number"
+            name="target-value"
+            id="target-value"
+            placeholder="Value"
+            value={valueData === 0 ? "" : valueData}
+            onChange={e => setValueData(Number(e.target.value))}
+        />;
     }
     let targetIndex = null;
     const targetIndexAlgorithms = ["deletion", "insertion",];
     if (targetIndexAlgorithms.includes(algorithm)) {
-        targetIndex = <input className="input" type="number" name="target-index" id="target-index" placeholder="Index" />
+        targetIndex = <input
+            className="input"
+            type="number"
+            name="target-index"
+            id="target-index"
+            placeholder="Index"
+            value={indexData === 0 ? "" : indexData}
+            onChange={e => setIndexData(Number(e.target.value))}
+        />
     }
 
-    const [randomSize, setRandomSize] = useState<number>(0);
+    const [randomizeSize, setRandomizeSize] = useState<number>(0);
     const randomizeData = () => {
 
-        const arr = Array.from({ length: randomSize }, (_, i) => i + 1);
+        const arr = Array.from({ length: randomizeSize }, (_, i) => i + 1);
         // Fisher–Yates shuffle
-        for (let i = randomSize - 1; i > 0; i--) {
+        for (let i = randomizeSize - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [arr[i], arr[j]] = [arr[j], arr[i]];
         }
@@ -113,15 +147,15 @@ export function LeftPanel({ onDataChange, structure, setStructure, algorithm, se
                 </div>
                 <div className="left-panel-button-container">
                     <div className="random-container">
-                        <Button text="Randomize" className="left-panel-button" onClick={randomizeData}/>
-                        <input 
-                        type="number" 
-                        className="input" 
-                        placeholder="Size" 
-                        value={randomSize === 0 ? "" : randomSize} 
-                        onChange={e => setRandomSize(Number(e.target.value))}/>
+                        <Button text="Randomize" className="left-panel-button" onClick={randomizeData} />
+                        <input
+                            type="number"
+                            className="input"
+                            placeholder="Size"
+                            value={randomizeSize === 0 ? "" : randomizeSize}
+                            onChange={e => setRandomizeSize(Number(e.target.value))} />
                     </div>
-                    <Button className="left-panel-button" text="Clear" onClick={clearData}/>
+                    <Button className="left-panel-button" text="Clear" onClick={clearData} />
 
                 </div>
 

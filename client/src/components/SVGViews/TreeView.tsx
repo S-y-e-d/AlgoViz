@@ -97,22 +97,23 @@ function edgeLine(
 
 export const TreeView = ({ size, data }: ViewProps) => {
     const dataWidth: number[] = new Array(data.length).fill(0);
-    getSubTreeWidth(0, data, dataWidth);
-    const xPositions = computeXCoordinates(data, size);
+    const dataValues = data.map(item => item.val);
+    getSubTreeWidth(0, dataValues, dataWidth);
+    const xPositions = computeXCoordinates(dataValues, size);
     const startX = (1000 - (Math.max(...xPositions) - Math.min(...xPositions))) / 2;
     const startY = (1000 - (2 * Math.floor(Math.log2(data.length)) - 1) * size) / 2;
 
     return (
         <>
             {
-                data.map((value, index) => {
+                data.map((item, index) => {
                     const x = startX + xPositions[index];
                     const y = startY + 2 * size * Math.floor(Math.log2(index + 1));
                     const fontSize = Math.min(
                         size * 0.5,
-                        (size * 0.8) / String(value).length * 1.5
+                        (size * 0.8) / String(item.val).length * 1.5
                     );
-                    if (isNaN(value)) {
+                    if (isNaN(item.val)) {
                         return;
                     }
                     const parent2 = parent(index);
@@ -121,7 +122,7 @@ export const TreeView = ({ size, data }: ViewProps) => {
                     const { x1, y1, x2, y2 } = edgeLine(x, y, px, py, size / 2);
                     console.log(data)
                     return (
-                        <g key={index}>
+                        <g key={item.id}>
                             <circle r={size / 2} cx={x} cy={y} />
                             <text
                                 x={x}
@@ -130,7 +131,7 @@ export const TreeView = ({ size, data }: ViewProps) => {
                                 dominantBaseline="middle"
                                 fontSize={fontSize}
                             >
-                                {value}
+                                {item.val}
                             </text>
                             <line x1={x1} y1={y1} x2={x2} y2={y2} />
                         </g>

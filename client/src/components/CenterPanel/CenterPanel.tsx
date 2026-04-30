@@ -9,11 +9,13 @@ type CenterPanelProps = {
   data: DataItem[];
   structure: StructureType;
   nodeRefs: React.RefObject<Map<number, SVGGElement>>;
+  size: number;
 }
 export function CenterPanel({
   data,
   structure,
   nodeRefs,
+  size,
 }: CenterPanelProps) {
 
 
@@ -25,7 +27,6 @@ export function CenterPanel({
   const ViewComponent = structureMap[structure];
 
 
-  const size = 100;
   return (
     <div id="center-panel" className="panel">
       <div className="bar panel-bar" id="center-panel-bar">Visualization Window

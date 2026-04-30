@@ -2,12 +2,15 @@ import { useEffect, useRef, type RefObject } from "react"
 import gsap from "gsap";
 import SeekIcon from "../../assets/seek-icon.svg?react"
 import { Button } from "../Button/Button";
-import type { DataItem } from "../../App";
-import { bubbleSortTL } from "../../animations/array/sorting";
+import type { AlgoType, DataItem } from "../../App";
+import { bubbleSortTL, insertionTL } from "../../animations/array/algorithms";
 
 type BottomBarProps = {
   data: DataItem[];
+  valueData: number;
+  indexData: number;
   nodeRefs: RefObject<Map<number, SVGGElement>>;
+  algorithm: AlgoType;
   isTLPaused: RefObject<boolean>;
   setTLPaused: (b: boolean) => void;
   refreshData: () => void;
@@ -15,7 +18,7 @@ type BottomBarProps = {
 
 
 
-export function BottomBar({ data, nodeRefs, isTLPaused, setTLPaused, refreshData }: BottomBarProps) {
+export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isTLPaused, setTLPaused, refreshData }: BottomBarProps) {
 
   // function to set the timeline
   const tlRef = useRef<GSAPTimeline | null>(null);
@@ -55,12 +58,32 @@ export function BottomBar({ data, nodeRefs, isTLPaused, setTLPaused, refreshData
   }, [data])
 
   const setAlgorhtm = () => {
-    // create the animation for the algorithm
-    const tl = (bubbleSortTL(
-      [...data.filter(v => !isNaN(v.val))],
-      (i) => nodeRefs.current.get(i) ?? null,
-      isTLPaused,
-    ));
+    let tl = null;
+    switch (algorithm) {
+      case "bubble-sort":
+
+        tl = (bubbleSortTL(
+          [...data.filter(v => !isNaN(v.val))],
+          (i) => nodeRefs.current.get(i) ?? null,
+          isTLPaused,
+        ));
+
+        break;
+      
+      case "insertion":
+        tl = (insertionTL(
+          [...data.filter(v => !isNaN(v.val))],
+          valueData,
+          indexData,
+          (i) => nodeRefs.current.get(i) ?? null,
+          isTLPaused,
+        ));
+        break;
+
+      default:
+        tl = null;
+        break;
+    }
     tlRef.current = tl;
 
   }
