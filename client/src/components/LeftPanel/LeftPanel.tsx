@@ -15,7 +15,7 @@ type LeftPanelProps = {
     setSize: (n: number) => void;
 };
 
-export function LeftPanel({ 
+export function LeftPanel({
     onDataChange,
     valueData,
     setValueData,
@@ -32,7 +32,7 @@ export function LeftPanel({
     const handleSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const size = Number(e.target.value);
         setSizeSliderValue(size);
-        setSize(50 + size * 25);
+        setSize(25 + size * 25);
     };
 
     // temporary default data input
@@ -82,11 +82,23 @@ export function LeftPanel({
     const [randomizeSize, setRandomizeSize] = useState<number>(0);
     const randomizeData = () => {
 
-        const arr = Array.from({ length: randomizeSize }, (_, i) => i + 1);
-        // Fisher–Yates shuffle
-        for (let i = randomizeSize - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
+        let arr;
+        if (algorithm === "binary-search") {
+            let prev = 0;
+            arr = [];
+            for (let i = 0; i < randomizeSize; i++) {
+                const num = prev + Math.round(Math.random()+1);
+                arr.push(num);
+                prev = num;
+            }
+        } else {
+            arr = Array.from({ length: randomizeSize }, (_, i) => i + 1);
+            // Fisher–Yates shuffle
+            for (let i = randomizeSize - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+
         }
         setDataInput(arr.join(","));
         onDataChange(arr);
@@ -127,6 +139,8 @@ export function LeftPanel({
                     <option value="linear-search">Linear Search</option>
                     <option value="binary-search">Binary Search</option>
                     <option value="bubble-sort">Bubble Sort</option>
+                    <option value="selection-sort">Selection Sort</option>
+                    <option value="insertion-sort">Insertion Sort</option>
                 </select>
 
                 <hr />

@@ -3,7 +3,7 @@ import gsap from "gsap";
 import SeekIcon from "../../assets/seek-icon.svg?react"
 import { Button } from "../Button/Button";
 import type { AlgoType, DataItem } from "../../App";
-import { bubbleSortTL, insertionTL } from "../../animations/array/algorithms";
+import { binarySearchTL, bubbleSortTL, deletionTL, insertionSortTL, insertionTL, linearSearchTL, selectionSortTL } from "../../animations/array/algorithms";
 
 type BottomBarProps = {
   data: DataItem[];
@@ -60,6 +60,44 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
   const setAlgorhtm = () => {
     let tl = null;
     switch (algorithm) {
+      
+      case "insertion":
+        tl = (insertionTL(
+          [...data.filter(v => !isNaN(v.val))],
+          valueData,
+          indexData,
+          (i) => nodeRefs.current.get(i) ?? null,
+          isTLPaused,
+        ));
+        break;
+
+      case "deletion":
+        tl = (deletionTL(
+          [...data.filter(v => !isNaN(v.val))],
+          indexData,
+          (i) => nodeRefs.current.get(i) ?? null,
+          isTLPaused,
+        ));
+        break;
+
+      case "linear-search":
+        tl = (linearSearchTL(
+          [...data.filter(v => !isNaN(v.val))],
+          valueData,
+          (i) => nodeRefs.current.get(i) ?? null,
+          isTLPaused,
+        ));
+        break;
+
+      case "binary-search":
+        tl = (binarySearchTL(
+          [...data.filter(v => !isNaN(v.val))],
+          valueData,
+          (i) => nodeRefs.current.get(i) ?? null,
+          isTLPaused,
+        ));
+        break;
+
       case "bubble-sort":
 
         tl = (bubbleSortTL(
@@ -69,12 +107,18 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
         ));
 
         break;
-      
-      case "insertion":
-        tl = (insertionTL(
+
+      case "selection-sort":
+        tl = (selectionSortTL(
           [...data.filter(v => !isNaN(v.val))],
-          valueData,
-          indexData,
+          (i) => nodeRefs.current.get(i) ?? null,
+          isTLPaused,
+        ));
+        break;
+
+      case "insertion-sort":
+        tl = (insertionSortTL(
+          [...data.filter(v => !isNaN(v.val))],
           (i) => nodeRefs.current.get(i) ?? null,
           isTLPaused,
         ));

@@ -10,7 +10,7 @@ export class MissingElementError extends Error {
 }
 
 // create the highlight rect 
-export const getHighlightOverlay = (el: SVGElement): SVGRectElement => {
+const getHighlightOverlay = (el: SVGElement): SVGRectElement => {
     const rect = el.querySelector("rect");
     if (!rect) throw new MissingElementError(`No <rect> element found`);
 
@@ -45,7 +45,7 @@ export const highlightTL = (
     tl: GSAPTimeline,
     index: number,
     getEl: GetElementByIndex,
-    color: "yellow" | "orange" | "green" | "red",
+    color: "yellow" | "orange" | "blue" | "green" | "red",
     position?: string | number
 ) => {
     const el = getEl(index);
@@ -203,7 +203,6 @@ export const shiftTL = (
 }
 
 export const setValueTL = (
-    array: DataItem[],
     value: number,
     index: number,
     getEl: GetElementByIndex,
