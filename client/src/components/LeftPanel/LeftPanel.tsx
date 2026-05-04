@@ -79,7 +79,7 @@ export function LeftPanel({
         />
     }
 
-    const [randomizeSize, setRandomizeSize] = useState<number>(0);
+    const [randomizeSize, setRandomizeSize] = useState<number>(8);
     const randomizeData = () => {
 
         let arr;
@@ -141,6 +141,7 @@ export function LeftPanel({
                     <option value="bubble-sort">Bubble Sort</option>
                     <option value="selection-sort">Selection Sort</option>
                     <option value="insertion-sort">Insertion Sort</option>
+                    <option value="merge-sort">Merge Sort</option>
                 </select>
 
                 <hr />

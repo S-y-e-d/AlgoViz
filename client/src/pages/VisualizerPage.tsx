@@ -22,11 +22,15 @@ export const VisualizerPage = () => {
   const [indexData, setIndexData] = useState(0);
 
   const refreshData = () => {
+    const temps = document.querySelectorAll(".temp");
+    temps.forEach((item) => item.remove());
     const temp = data.map((item) => item.val);
     onDataChange(temp);
   }
 
   const onDataChange = (array: number[]) => {
+    const temps = document.querySelectorAll(".temp");
+    temps.forEach((item) => item.remove());
     setData([]);
     const items: DataItem[] = array.map((n) => ({
       id: crypto.randomUUID(),
@@ -37,7 +41,7 @@ export const VisualizerPage = () => {
 
   // Input to select the structure
   const [structure, setStructure] = useState<StructureType>("array");
-  const [algorithm, setAlgoritm] = useState<AlgoType>("insertion");
+  const [algorithm, setAlgoritm] = useState<AlgoType>("merge-sort");
 
 
   const nodeRefs = useRef<Map<number, SVGGElement>>(new Map());

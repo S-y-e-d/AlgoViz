@@ -4,13 +4,15 @@ import { HomePage } from "./pages/HomePage";
 
 export type StructureType = "array" | "list" | "tree";
 export type AlgoType = 
-"insertion" | 
-"deletion" | 
-"binary-search" | 
-"linear-search"|
-"bubble-sort" | 
-"insertion-sort"|
-"selection-sort";
+  "insertion" | 
+  "deletion" | 
+  "binary-search" | 
+  "linear-search"|
+  "bubble-sort" | 
+  "insertion-sort"|
+  "selection-sort"|
+  "merge-sort"
+;
 
 export type GetElementByIndex = (index: number) => SVGGElement | null;
 export type DataItem = {

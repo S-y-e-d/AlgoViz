@@ -3,7 +3,7 @@ import gsap from "gsap";
 import SeekIcon from "../../assets/seek-icon.svg?react"
 import { Button } from "../Button/Button";
 import type { AlgoType, DataItem } from "../../App";
-import { binarySearchTL, bubbleSortTL, deletionTL, insertionSortTL, insertionTL, linearSearchTL, selectionSortTL } from "../../animations/array/algorithms";
+import { binarySearchTL, bubbleSortTL, deletionTL, insertionSortTL, insertionTL, linearSearchTL, mergeSortTL, selectionSortTL } from "../../animations/array/algorithms";
 
 type BottomBarProps = {
   data: DataItem[];
@@ -124,6 +124,15 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
         ));
         break;
 
+      case "merge-sort":
+        tl = (mergeSortTL(
+          [...data.filter(v => !isNaN(v.val))],
+          (i) => nodeRefs.current.get(i) ?? null,
+          isTLPaused,
+        ));
+        break;
+
+
       default:
         tl = null;
         break;
@@ -181,6 +190,7 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
     tlPlayAnimateRef.current?.play();
 
     setTLPaused(true);
+
     refreshData();
   }
 
