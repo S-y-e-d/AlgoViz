@@ -18,8 +18,8 @@ export const VisualizerPage = () => {
 
   // input box data to set the middle structure values 
   const [data, setData] = useState<DataItem[]>([]);
-  const [valueData, setValueData] = useState(0);
-  const [indexData, setIndexData] = useState(0);
+  const [valueData, setValueData] = useState("");
+  const [indexData, setIndexData] = useState("");
 
   const refreshData = () => {
     const temps = document.querySelectorAll(".temp");
@@ -41,7 +41,7 @@ export const VisualizerPage = () => {
 
   // Input to select the structure
   const [structure, setStructure] = useState<StructureType>("array");
-  const [algorithm, setAlgoritm] = useState<AlgoType>("merge-sort");
+  const [algorithm, setAlgoritm] = useState<AlgoType>("insertion");
 
 
   const nodeRefs = useRef<Map<number, SVGGElement>>(new Map());
@@ -80,7 +80,12 @@ export const VisualizerPage = () => {
               nodeRefs={nodeRefs}
               size={size}
             /></div>
-          <div className="right-panel"><RightPanel /></div>
+          <div className="right-panel">
+            <RightPanel 
+              structure={structure}
+              algorithm={algorithm}
+            />
+            </div>
         </div>
         <div className="bottom">
           <BottomBar

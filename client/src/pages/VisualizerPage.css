@@ -16,7 +16,7 @@
   display: grid;
   grid-template-rows: 8vh 75vh 8vh;
 
-  gap: 1rem;
+  gap: 2vh;
 
   background-color: var(--bg-layout);
   border-radius: 20px;

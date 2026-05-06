@@ -7,8 +7,8 @@ import { binarySearchTL, bubbleSortTL, deletionTL, insertionSortTL, insertionTL,
 
 type BottomBarProps = {
   data: DataItem[];
-  valueData: number;
-  indexData: number;
+  valueData: string;
+  indexData: string;
   nodeRefs: RefObject<Map<number, SVGGElement>>;
   algorithm: AlgoType;
   isTLPaused: RefObject<boolean>;
@@ -55,17 +55,25 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
   useEffect(() => {
     tlRef.current?.pause(0);
     tlRef.current = null;
+
+    tlPlayAnimateRef.current?.play();
   }, [data])
 
   const setAlgorhtm = () => {
     let tl = null;
+    const targetValueAlgorithms = ["insertion", "binarySearch", "linearSearch"];
+    const targetIndexAlgorithms = ["deletion", "insertion",];
+    if(targetValueAlgorithms.includes(algorithm) && valueData === "")
+      return false;
+    if(targetIndexAlgorithms.includes(algorithm) && indexData === "")
+      return false;
     switch (algorithm) {
       
       case "insertion":
         tl = (insertionTL(
           [...data.filter(v => !isNaN(v.val))],
-          valueData,
-          indexData,
+          Number(valueData),
+          Number(indexData),
           (i) => nodeRefs.current.get(i) ?? null,
           isTLPaused,
         ));
@@ -74,31 +82,31 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
       case "deletion":
         tl = (deletionTL(
           [...data.filter(v => !isNaN(v.val))],
-          indexData,
+          Number(indexData),
           (i) => nodeRefs.current.get(i) ?? null,
           isTLPaused,
         ));
         break;
 
-      case "linear-search":
+      case "linearSearch":
         tl = (linearSearchTL(
           [...data.filter(v => !isNaN(v.val))],
-          valueData,
+          Number(valueData),
           (i) => nodeRefs.current.get(i) ?? null,
           isTLPaused,
         ));
         break;
 
-      case "binary-search":
+      case "binarySearch":
         tl = (binarySearchTL(
           [...data.filter(v => !isNaN(v.val))],
-          valueData,
+          Number(valueData),
           (i) => nodeRefs.current.get(i) ?? null,
           isTLPaused,
         ));
         break;
 
-      case "bubble-sort":
+      case "bubbleSort":
 
         tl = (bubbleSortTL(
           [...data.filter(v => !isNaN(v.val))],
@@ -108,7 +116,7 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
 
         break;
 
-      case "selection-sort":
+      case "selectionSort":
         tl = (selectionSortTL(
           [...data.filter(v => !isNaN(v.val))],
           (i) => nodeRefs.current.get(i) ?? null,
@@ -116,7 +124,7 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
         ));
         break;
 
-      case "insertion-sort":
+      case "insertionSort":
         tl = (insertionSortTL(
           [...data.filter(v => !isNaN(v.val))],
           (i) => nodeRefs.current.get(i) ?? null,
@@ -124,7 +132,7 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
         ));
         break;
 
-      case "merge-sort":
+      case "mergeSort":
         tl = (mergeSortTL(
           [...data.filter(v => !isNaN(v.val))],
           (i) => nodeRefs.current.get(i) ?? null,
@@ -139,6 +147,7 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
     }
     tlRef.current = tl;
 
+    return true;
   }
 
   const playButtonToggle = () => {
@@ -154,11 +163,12 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
 
   const handlePlayClick = () => {
 
-    playButtonToggle();
 
     if (tlRef.current === null) {
-      setAlgorhtm();
+      if(setAlgorhtm() === false) 
+        return;
     }
+    playButtonToggle();
 
     if (isTLPaused.current === true) {
       if (tlRef.current != null) {

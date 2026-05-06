@@ -16,16 +16,17 @@
 }
 
 .light {
-  --bg-page: white;
-  --bg-layout: #FAFAFA;
-  --bg-panel: #F5F5F5;
-  --bg-bar: #F0F0F0;
+--bg-page: #EAEAEA;
+  --bg-layout: #EFEFEF;
+  --bg-panel: #EFEFEF;
+  --bg-bar: #DFDFDF;
+
 
   --bg-scroll-hover: #000000;
   --bg-scroll: #999999;
 
-  --border-color: #303030;
-  --text-color: #AAAAAA;
+  --border-color: #E0E0E0;
+  --text-color: #333;
 
   --svg-stroke: #000;
   --svg-text: #000;

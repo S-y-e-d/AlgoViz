@@ -273,6 +273,7 @@ const mergeSplitArray = (
         const tempColor = highlightTempRectTL(movedObj.rect, "green", tl);
         tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
         highlightTempRectTL(movedObj.rect, tempColor, tl);
+        tl.to({}, {duration:0.25});
         moveAndSetText(array, k, targetVal, movedObj.text, trueText, tl, isTLPaused);
         highlightTempRectTL(movedObj.rect, ogColor, tl);
         k += 1;

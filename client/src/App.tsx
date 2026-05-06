@@ -6,12 +6,12 @@ export type StructureType = "array" | "list" | "tree";
 export type AlgoType = 
   "insertion" | 
   "deletion" | 
-  "binary-search" | 
-  "linear-search"|
-  "bubble-sort" | 
-  "insertion-sort"|
-  "selection-sort"|
-  "merge-sort"
+  "binarySearch" | 
+  "linearSearch"|
+  "bubbleSort" | 
+  "insertionSort"|
+  "selectionSort"|
+  "mergeSort"
 ;
 
 export type GetElementByIndex = (index: number) => SVGGElement | null;

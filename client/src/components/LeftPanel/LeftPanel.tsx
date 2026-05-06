@@ -4,10 +4,10 @@ import type { AlgoType, StructureType } from "../../App";
 
 type LeftPanelProps = {
     onDataChange: (data: number[]) => void;
-    valueData: number;
-    setValueData: (n: number) => void;
-    indexData: number;
-    setIndexData: (n: number) => void;
+    valueData: string;
+    setValueData: (n: string) => void;
+    indexData: string;
+    setIndexData: (n: string) => void;
     structure: StructureType;
     setStructure: (structure: StructureType) => void;
     algorithm: AlgoType;
@@ -53,7 +53,7 @@ export function LeftPanel({
 
 
     let targetValue = null;
-    const targetValueAlgorithms = ["insertion", "binary-search", "linear-search"];
+    const targetValueAlgorithms = ["insertion", "binarySearch", "linearSearch"];
     if (targetValueAlgorithms.includes(algorithm)) {
         targetValue = <input
             className="input"
@@ -61,8 +61,8 @@ export function LeftPanel({
             name="target-value"
             id="target-value"
             placeholder="Value"
-            value={valueData === 0 ? "" : valueData}
-            onChange={e => setValueData(Number(e.target.value))}
+            value={valueData}
+            onChange={e => setValueData(e.target.value)}
         />;
     }
     let targetIndex = null;
@@ -74,27 +74,29 @@ export function LeftPanel({
             name="target-index"
             id="target-index"
             placeholder="Index"
-            value={indexData === 0 ? "" : indexData}
-            onChange={e => setIndexData(Number(e.target.value))}
+            value={indexData}
+            onChange={e => setIndexData(e.target.value)}
         />
     }
 
-    const [randomizeSize, setRandomizeSize] = useState<number>(8);
+    const [randomizeSize, setRandomizeSize] = useState<number>(0);
     const randomizeData = () => {
 
         let arr;
-        if (algorithm === "binary-search") {
+        const size = randomizeSize === 0 ? Math.floor(Math.random() * 10) + 5 : randomizeSize;
+            
+        if (algorithm === "binarySearch") {
             let prev = 0;
             arr = [];
-            for (let i = 0; i < randomizeSize; i++) {
+            for (let i = 0; i < size; i++) {
                 const num = prev + Math.round(Math.random()+1);
                 arr.push(num);
                 prev = num;
             }
         } else {
-            arr = Array.from({ length: randomizeSize }, (_, i) => i + 1);
+            arr = Array.from({ length: size }, (_, i) => i + 1);
             // Fisher–Yates shuffle
-            for (let i = randomizeSize - 1; i > 0; i--) {
+            for (let i = size - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [arr[i], arr[j]] = [arr[j], arr[i]];
             }
@@ -136,12 +138,12 @@ export function LeftPanel({
                 >
                     <option value="insertion">Insertion</option>
                     <option value="deletion">Deletion</option>
-                    <option value="linear-search">Linear Search</option>
-                    <option value="binary-search">Binary Search</option>
-                    <option value="bubble-sort">Bubble Sort</option>
-                    <option value="selection-sort">Selection Sort</option>
-                    <option value="insertion-sort">Insertion Sort</option>
-                    <option value="merge-sort">Merge Sort</option>
+                    <option value="linearSearch">Linear Search</option>
+                    <option value="binarySearch">Binary Search</option>
+                    <option value="bubbleSort">Bubble Sort</option>
+                    <option value="selectionSort">Selection Sort</option>
+                    <option value="insertionSort">Insertion Sort</option>
+                    <option value="mergeSort">Merge Sort</option>
                 </select>
 
                 <hr />

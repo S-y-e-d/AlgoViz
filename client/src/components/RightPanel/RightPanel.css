@@ -12,3 +12,8 @@
     padding: 12px;
     overflow-y: auto;
 }
+
+.right-panel-content h2 {
+    margin: 0;
+    text-align: center;
+}
