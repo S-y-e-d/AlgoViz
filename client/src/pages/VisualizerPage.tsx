@@ -18,8 +18,8 @@ export const VisualizerPage = () => {
 
   // input box data to set the middle structure values 
   const [data, setData] = useState<DataItem[]>([]);
-  const [valueData, setValueData] = useState("");
-  const [indexData, setIndexData] = useState("");
+  const [valueData, setValueData] = useState("1");
+  const [indexData, setIndexData] = useState("1");
 
   const refreshData = () => {
     const temps = document.querySelectorAll(".temp");
@@ -40,7 +40,7 @@ export const VisualizerPage = () => {
   }
 
   // Input to select the structure
-  const [structure, setStructure] = useState<StructureType>("array");
+  const [structure, setStructure] = useState<StructureType>("list");
   const [algorithm, setAlgoritm] = useState<AlgoType>("insertion");
 
 
@@ -49,7 +49,6 @@ export const VisualizerPage = () => {
   const isTLPaused = useRef<boolean>(true);
   const setTLPaused = (b: boolean) => {
     isTLPaused.current = b;
-    console.log(isTLPaused.current);
   }
 
   const [size, setSize] = useState<number>(100);
@@ -81,11 +80,11 @@ export const VisualizerPage = () => {
               size={size}
             /></div>
           <div className="right-panel">
-            <RightPanel 
+            <RightPanel
               structure={structure}
               algorithm={algorithm}
             />
-            </div>
+          </div>
         </div>
         <div className="bottom">
           <BottomBar
@@ -93,6 +92,7 @@ export const VisualizerPage = () => {
             valueData={valueData}
             indexData={indexData}
             nodeRefs={nodeRefs}
+            structure={structure}
             algorithm={algorithm}
             isTLPaused={isTLPaused}
             setTLPaused={setTLPaused}

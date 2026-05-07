@@ -2,14 +2,16 @@ import { useEffect, useRef, type RefObject } from "react"
 import gsap from "gsap";
 import SeekIcon from "../../assets/seek-icon.svg?react"
 import { Button } from "../Button/Button";
-import type { AlgoType, DataItem } from "../../App";
-import { binarySearchTL, bubbleSortTL, deletionTL, insertionSortTL, insertionTL, linearSearchTL, mergeSortTL, selectionSortTL } from "../../animations/array/algorithms";
+import type { AlgorithmParams, AlgoType, DataItem, StructureType } from "../../App";
+import {  arrayAnimBuilder } from "../../animations/array";
+import { listAnimBuilder } from "../../animations/list";
 
 type BottomBarProps = {
   data: DataItem[];
   valueData: string;
   indexData: string;
   nodeRefs: RefObject<Map<number, SVGGElement>>;
+  structure: StructureType,
   algorithm: AlgoType;
   isTLPaused: RefObject<boolean>;
   setTLPaused: (b: boolean) => void;
@@ -18,7 +20,7 @@ type BottomBarProps = {
 
 
 
-export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isTLPaused, setTLPaused, refreshData }: BottomBarProps) {
+export function BottomBar({ data, valueData, indexData, nodeRefs, structure, algorithm, isTLPaused, setTLPaused, refreshData }: BottomBarProps) {
 
   // function to set the timeline
   const tlRef = useRef<GSAPTimeline | null>(null);
@@ -67,82 +69,21 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, algorithm, isT
       return false;
     if(targetIndexAlgorithms.includes(algorithm) && indexData === "")
       return false;
-    switch (algorithm) {
-      
-      case "insertion":
-        tl = (insertionTL(
-          [...data.filter(v => !isNaN(v.val))],
-          Number(valueData),
-          Number(indexData),
-          (i) => nodeRefs.current.get(i) ?? null,
-          isTLPaused,
-        ));
+
+    const algorithmParams: AlgorithmParams = {
+      array: [...data.filter(v => ~!isNaN(v.val))],
+      value: valueData === "" ? undefined : Number(valueData),
+      index: indexData === "" ? undefined : Number(indexData),
+      getEl: (i:number) => nodeRefs.current.get(i) ?? null,
+      isTLPaused: isTLPaused,
+    }
+    
+    switch(structure) {
+      case "array":
+        tl = arrayAnimBuilder[algorithm](algorithmParams);
         break;
-
-      case "deletion":
-        tl = (deletionTL(
-          [...data.filter(v => !isNaN(v.val))],
-          Number(indexData),
-          (i) => nodeRefs.current.get(i) ?? null,
-          isTLPaused,
-        ));
-        break;
-
-      case "linearSearch":
-        tl = (linearSearchTL(
-          [...data.filter(v => !isNaN(v.val))],
-          Number(valueData),
-          (i) => nodeRefs.current.get(i) ?? null,
-          isTLPaused,
-        ));
-        break;
-
-      case "binarySearch":
-        tl = (binarySearchTL(
-          [...data.filter(v => !isNaN(v.val))],
-          Number(valueData),
-          (i) => nodeRefs.current.get(i) ?? null,
-          isTLPaused,
-        ));
-        break;
-
-      case "bubbleSort":
-
-        tl = (bubbleSortTL(
-          [...data.filter(v => !isNaN(v.val))],
-          (i) => nodeRefs.current.get(i) ?? null,
-          isTLPaused,
-        ));
-
-        break;
-
-      case "selectionSort":
-        tl = (selectionSortTL(
-          [...data.filter(v => !isNaN(v.val))],
-          (i) => nodeRefs.current.get(i) ?? null,
-          isTLPaused,
-        ));
-        break;
-
-      case "insertionSort":
-        tl = (insertionSortTL(
-          [...data.filter(v => !isNaN(v.val))],
-          (i) => nodeRefs.current.get(i) ?? null,
-          isTLPaused,
-        ));
-        break;
-
-      case "mergeSort":
-        tl = (mergeSortTL(
-          [...data.filter(v => !isNaN(v.val))],
-          (i) => nodeRefs.current.get(i) ?? null,
-          isTLPaused,
-        ));
-        break;
-
-
-      default:
-        tl = null;
+      case "list":
+        tl = listAnimBuilder[algorithm](algorithmParams);
         break;
     }
     tlRef.current = tl;

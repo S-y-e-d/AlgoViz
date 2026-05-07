@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import type { DataItem, GetElementByIndex } from "../../App";
+import type { ColorType, DataItem, GetElementByIndex } from "../App";
 import type { RefObject } from "react";
 
 export class MissingElementError extends Error {
@@ -47,15 +47,13 @@ const getHighlightOverlay = (rect: SVGRectElement): SVGRectElement => {
 };
 
 // highlight the given index with the specified color
-export const highlightTL = (
+export const highlightArrayTL = (
+    el: SVGGElement | null,
+    color: ColorType,
     tl: GSAPTimeline,
-    index: number,
-    getEl: GetElementByIndex,
-    color: "yellow" | "orange" | "blue" | "green" | "red",
     position?: string | number
 ) => {
-    const el = getEl(index);
-    if (!el) throw new MissingElementError(`No element at index ${index}`);
+    if (!el) throw new MissingElementError(`No element to highlight`);
     const rect = el.querySelector("rect");
     if (!rect) throw new MissingElementError(`No <rect> element found`);
 
@@ -79,8 +77,8 @@ export const highlightTL = (
 
 // remove the highlight overlay rect
 export const removeOverlayTL = (
-    tl: GSAPTimeline,
     overlay: SVGRectElement,
+    tl: GSAPTimeline,
     position?: string | number
 ) => {
     tl.to(
@@ -96,26 +94,26 @@ export const removeOverlayTL = (
 
 // compare elements at two indices
 export const compareGTTL = (
-    tl: GSAPTimeline,
     i: number,
     j: number,
     array: DataItem[],
     getEl: GetElementByIndex,
+    tl: GSAPTimeline,
     isTLPaused: RefObject<boolean>,
 ) => {
     const isGreater = array[i].val > array[j].val;
     const color = isGreater ? "red" : "green";
 
-    const o1 = highlightTL(tl, i, getEl, color);
-    const o2 = highlightTL(tl, j, getEl, color, "<");
+    const o1 = highlightArrayTL(getEl(i), color, tl);
+    const o2 = highlightArrayTL(getEl(j), color, tl, "<");
 
     tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
 
     // delay
     tl.to({}, { duration: 0.25 });
 
-    removeOverlayTL(tl, o1);
-    removeOverlayTL(tl, o2, "<");
+    removeOverlayTL(o1, tl);
+    removeOverlayTL(o2, tl, "<");
 
     return isGreater;
 };
@@ -388,7 +386,7 @@ export const createSplitArrayTL = (
 
         textClone.setAttribute("opacity", "0");
         textClone.textContent = String(array[i].val);
-        
+
 
         tl.set(text, { opacity: 0 }, i === 0 ? undefined : "<");
         tl.set(textClone, { opacity: 1 }, "<");
@@ -503,5 +501,403 @@ export const highlightTempRectTL = (
     return ogColor;
 }
 
+/* ============ Common Node Helpers ============ */
 
-// 1234 5678 9
+function edgeLine(
+    px: number,
+    py: number,
+    cx: number,
+    cy: number,
+    r: number
+) {
+    const dx = cx - px;
+    const dy = cy - py;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist === 0) {
+        return { x1: px, y1: py, x2: cx, y2: cy };
+    }
+
+    const ux = dx / dist;
+    const uy = dy / dist;
+
+    return {
+        x1: px + ux * r,
+        y1: py + uy * r,
+        x2: cx - ux * r,
+        y2: cy - uy * r,
+    };
+}
+
+/* ============ Linked List ============ */
+
+export const highlightListTL = (
+    node: SVGGElement,
+    tl: GSAPTimeline,
+    color: ColorType,
+    position?: string,
+) => {
+
+    if (!node)
+        throw new MissingElementError(`Missing node while highlighting`);
+
+    tl.to(node, {
+        stroke: color,
+        duration: 0.25,
+    }, position);
+
+}
+
+export const createNewListNode = (
+    value: number,
+    getEl: GetElementByIndex,
+    tl: GSAPTimeline,
+    isTLPaused: RefObject<boolean>,
+): SVGGElement => {
+
+    const head = getEl(0);
+    if (!head)
+        throw new MissingElementError("Empty list");
+
+    const clone = head.cloneNode(true) as SVGCircleElement;
+    clone.setAttribute("opacity", "0");
+    const newText = clone.querySelector("text");
+    if (newText !== null) {
+        newText.textContent = String(value);
+    }
+    clone.classList.add("temp");
+
+    head.parentElement?.after(clone);
+
+    const circ = head.querySelector("circle");
+    if (!circ)
+        throw new MissingElementError("Missing circle in head");
+    const radius = gsap.getProperty(circ, "r") as number;
+    const currentY = gsap.getProperty(head, "y") as number;
+    tl.to(clone, {
+        y: currentY + 4 * radius,
+        duration: 0.25,
+        opacity: 1
+    });
+
+    gsap.set(clone.querySelector("circle"), {stroke: "green"});
+
+    tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
+
+    return clone;
+}
+
+const animateArrowTL = (
+    current: SVGGElement,
+    tl: GSAPTimeline,
+    position?: string | undefined,
+) => {
+    const line = current.parentElement?.querySelector("line") as SVGLineElement;
+    line.classList.add("temp");
+
+    const clone = line.cloneNode(false) as SVGLineElement;
+    line.after(clone);
+    const length = line.getTotalLength();
+
+    tl.fromTo(clone,
+        {
+            strokeDasharray: length,
+            strokeDashoffset: length,
+            stroke: "yellow",
+        },
+        {
+            strokeDashoffset: 0,
+            duration: 0.125,
+            ease: "none"
+        },
+        position
+    );
+    tl.to(clone, {
+        strokeDashoffset: -length,
+        duration: 0.125,
+        ease: "none",
+        onComplete: () => clone.remove(),
+    });
+}
+
+export const highlightNodeTL = (
+    el: SVGGElement,
+    color: ColorType,
+    tl: GSAPTimeline,
+    position?: string | number,
+) => {
+
+    const node = el.querySelector("circle") as SVGCircleElement;
+
+    if (!node)
+        throw new MissingElementError("Missing Circle");
+
+    tl.to(node, {
+        // css: {stroke: color},
+        stroke: color,
+        duration: 0.25,
+    }, position);
+}
+
+export const moveNodeTL = (
+    node: SVGGElement,
+    pos: { x?: number, y?: number },
+    tl: GSAPTimeline,
+    position?: string | number,
+) => {
+    tl.to(node, {
+        ...pos,
+        duration: 0.25,
+    }, position)
+
+
+}
+
+export const highlightNextTL = (
+    current: SVGGElement | null,
+    next: SVGGElement | null,
+    originalColor: ColorType,
+    highlightColor: ColorType,
+    tl: GSAPTimeline,
+    isTLPaused: RefObject<boolean>,
+    position?: string | number,
+) => {
+
+
+    if (!current)
+        throw new MissingElementError(`Missing current node`);
+    if (!next)
+        throw new MissingElementError(`Missing next node`);
+
+    highlightNodeTL(current, originalColor, tl);
+
+    tl.addLabel(position as string);
+
+    animateArrowTL(current, tl, "<");
+
+    highlightNodeTL(next, highlightColor, tl);
+
+    tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
+}
+
+export const connectNodesTL = (
+    from: SVGGElement | null,
+    to: SVGGElement | null,
+    tl: GSAPTimeline,
+    isTLPaused: RefObject<boolean>,
+) => {
+    if (!from)
+        throw new MissingElementError("Missing from node");
+    if (!to)
+        throw new MissingElementError("Missing to node");
+
+    const parent = from.parentElement;
+    if (!parent)
+        throw new MissingElementError("Batman");
+
+    let line;
+    if (from.classList.contains("temp")) {
+        line = from.querySelector("line") as SVGLineElement;
+    } else {
+        line = parent.querySelector("line") as SVGLineElement;
+    }
+
+    if (!line) {
+        if (!from.classList.contains("temp")) {
+            console.log(line);
+            console.log(parent);
+            console.log(from);
+
+        }
+        line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line"
+        );
+        from.after(line);
+        line.classList.add("temp");
+        line.classList.add("temp-line");
+    }
+
+    const circ = to.querySelector("circle") as SVGCircleElement;
+    if (!circ)
+        throw new MissingElementError("No circle");
+
+    const radius = gsap.getProperty(circ, "r") as number;
+
+    const fromX = () => gsap.getProperty(from, "x") as number;
+    const fromY = () => gsap.getProperty(from, "y") as number;
+
+    const toX = () => gsap.getProperty(to, "x") as number;
+    const toY = () => gsap.getProperty(to, "y") as number;
+
+    // edgeLine is a function that gives me the coords of the line that starts
+    // and ends at the edges of two circles, and not at their centers.
+    const x1 = () => edgeLine(fromX(), fromY(), toX(), toY(), radius).x1;
+    const y1 = () => edgeLine(fromX(), fromY(), toX(), toY(), radius).y1;
+    const x2 = () => edgeLine(fromX(), fromY(), toX(), toY(), radius).x2;
+    const y2 = () => edgeLine(fromX(), fromY(), toX(), toY(), radius).y2;
+
+    tl.to(line, {
+        attr: {
+            x1: x1,
+            y1: y1,
+            x2: x1,
+            y2: y1,
+        },
+        duration: 0.25,
+    })
+
+    tl.call(() => {
+        line.setAttribute("marker-end", "url(#arrow)");
+    })
+
+    tl.to(line, {
+        attr: {
+            x1: x1,
+            y1: y1,
+            x2: x2,
+            y2: y2,
+        },
+        duration: 0.25,
+    })
+
+    tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
+
+}
+
+export const readjustListPositions = (
+    array: DataItem[],
+    targetIdx: number,
+    newNode: SVGGElement,
+    getEl: GetElementByIndex,
+    tl: GSAPTimeline,
+) => {
+
+    const overlap = 0.1;
+    const circ = getEl(0)?.querySelector("circle") as SVGCircleElement;
+    if (!circ)
+        throw new MissingElementError("No circ");
+    const r = gsap.getProperty(circ, "r") as number;
+
+    for (let i = 0; i < targetIdx; i++) {
+        const el = getEl(i) as SVGGElement;
+        const x = gsap.getProperty(el, "x") as number - 2 * r;
+        const y = gsap.getProperty(el, "y") as number;
+
+        tl.to(el,
+            {
+                x: x, y: y,
+                duration: 0.25,
+            },
+            i === 0 ? "move" : `-=${overlap}`
+        );
+
+        const nextLine = el.parentElement?.querySelector("line") as SVGLineElement;
+        if (nextLine) {
+            tl.to(
+                nextLine,
+                {
+                    attr: { x1: x + r, y1: y },
+                    duration: 0.25,
+                },
+                "<"
+            )
+        }
+        const prevLine = getEl(i - 1)?.parentElement?.querySelector("line") as SVGLineElement;
+        if (prevLine) {
+            tl.to(
+                prevLine,
+                {
+                    attr: { x2: x - r, y2: y },
+                    duration: 0.25,
+                },
+                "<"
+            )
+        }
+    }
+
+    for (let i = array.length - 1; i >= targetIdx; i--) {
+        const el = getEl(i) as SVGGElement;
+        const circ = el.querySelector("circle") as SVGCircleElement;
+        if (!circ)
+            throw new MissingElementError("No circ");
+        const r = gsap.getProperty(circ, "r") as number;
+        const x = gsap.getProperty(el, "x") as number + 2 * r;
+        const y = gsap.getProperty(el, "y") as number;
+
+        tl.to(el, {
+            x: x, y: y,
+            duration: 0.25,
+        },
+            i === 0 ? "move" : `-=${overlap}`
+        );
+
+        const line = el.parentElement?.querySelector("line") as SVGLineElement;
+        if (line) {
+            tl.to(
+                line,
+                {
+                    attr: { x1: x + r, y1: y },
+                    duration: 0.25,
+                },
+                "<"
+            )
+        }
+
+        const prevLine = getEl(i - 1)?.parentElement?.querySelector("line") as SVGLineElement;
+        if (prevLine && i !== targetIdx) {
+            tl.to(
+                prevLine,
+                {
+                    attr: { x2: x - r, y2: y },
+                    duration: 0.25,
+                },
+                "<"
+            )
+        }
+    }
+
+    const tempLine = newNode.parentElement?.querySelector(".temp-line") as SVGLineElement;
+
+    const prev = getEl(targetIdx - 1);
+    const prevLine = prev?.parentElement?.querySelector("line") as SVGLineElement;
+    const x = () => gsap.getProperty(prev, "x") as number + 4 * r;
+    const y = gsap.getProperty(prev, "y") as number;
+
+    tl.to(tempLine, {
+        attr: {
+            x2: () => x() + 3 * r,
+            y2: y
+        },
+        duration: 0.25,
+    }, "<")
+
+
+    tl.to(prevLine, {
+        attr: {
+            x2: () => x() - r,
+            y2: y,
+        },
+        duration: 0.25,
+
+    })
+
+    tl.to(newNode, {
+        x: x, y: y, duration: 0.25,
+    }, "<")
+
+    if (tempLine) {
+        console.log(tempLine);
+        tl.to(tempLine,
+            {
+                attr: {
+                    x1: () => x() + r,
+                    y1: y,
+                },
+                duration: 0.25,
+            },
+            "<"
+        )
+    }
+
+}

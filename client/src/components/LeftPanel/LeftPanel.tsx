@@ -83,13 +83,18 @@ export function LeftPanel({
     const randomizeData = () => {
 
         let arr;
-        const size = randomizeSize === 0 ? Math.floor(Math.random() * 10) + 5 : randomizeSize;
-            
+        const min =  structure === "array" ? 5 : 3;
+        const max = structure === "array" ? 15 : 8;
+        ;
+        const size = randomizeSize === 0
+            ? Math.floor(Math.random() * (max - min + 1)) + min
+            : randomizeSize;
+
         if (algorithm === "binarySearch") {
             let prev = 0;
             arr = [];
             for (let i = 0; i < size; i++) {
-                const num = prev + Math.round(Math.random()+1);
+                const num = prev + Math.round(Math.random() + 1);
                 arr.push(num);
                 prev = num;
             }

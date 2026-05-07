@@ -3,16 +3,15 @@ import { VisualizerPage } from "./pages/VisualizerPage";
 import { HomePage } from "./pages/HomePage";
 
 export type StructureType = "array" | "list" | "tree";
-export type AlgoType = 
-  "insertion" | 
-  "deletion" | 
-  "binarySearch" | 
-  "linearSearch"|
-  "bubbleSort" | 
-  "insertionSort"|
-  "selectionSort"|
-  "mergeSort"
-;
+export type AlgoType =
+  "insertion"
+  | "deletion"
+  | "binarySearch"
+  | "linearSearch"
+  | "bubbleSort"
+  | "insertionSort"
+  | "selectionSort"
+  | "mergeSort";
 
 export type GetElementByIndex = (index: number) => SVGGElement | null;
 export type DataItem = {
@@ -28,6 +27,16 @@ export type ViewProps = {
   data: DataItem[];
   nodeRefs: NodeRefs;
 };
+
+export type AlgorithmParams = {
+  array: DataItem[];
+  value?: number;
+  index?: number;
+  getEl: GetElementByIndex;
+  isTLPaused: React.RefObject<boolean>;
+}
+
+export type ColorType = "yellow" | "orange" | "red" | "green" | "blue";
 
 function App() {
   return (

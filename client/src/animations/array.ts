@@ -1,26 +1,47 @@
 import type { RefObject } from "react";
-import type { DataItem, GetElementByIndex } from "../../App";
-import { compareGTTL, createSplitArrayTL, highlightTempRectTL, highlightTL, MissingElementError, moveAndSetText, removeOverlayTL, removeSplitArrayTL, setValueTL, shiftTL, swapTL, type ClonedGroup } from "./helper";
+import type {
+    AlgorithmParams,
+    DataItem,
+    GetElementByIndex
+} from "../App";
+import {
+    compareGTTL,
+    createSplitArrayTL,
+    highlightTempRectTL,
+    highlightArrayTL,
+    MissingElementError,
+    moveAndSetText,
+    removeOverlayTL,
+    removeSplitArrayTL,
+    setValueTL,
+    shiftTL,
+    swapTL,
+    type ClonedGroup
+} from "./helper";
 import gsap from "gsap";
 
-export const insertionTL = (
-    array: DataItem[],
-    value: number,
-    index: number,
-    getEl: GetElementByIndex,
-    isTLPaused: RefObject<boolean>
+const verifyParam = (param: number | undefined) => {
+    if (param === undefined)
+        throw new Error("Missing parameter");
+    return param;
+}
+
+export const insertionArrayTL = (
+    { array, value, index, getEl, isTLPaused }: AlgorithmParams,
 
 ): GSAPTimeline => {
+    index = verifyParam(index);
+    value = verifyParam(index);
     if (index >= array.length) {
         throw new Error(`Index ${index} out of bounds`);
     }
     const tl = gsap.timeline();
     for (let i = array.length - 2; i >= index; i--) {
-        const o = highlightTL(tl, i, getEl, "yellow");
+        const o = highlightArrayTL(getEl(i), "yellow", tl);
         shiftTL(array, i, 1, getEl, tl, isTLPaused);
         tl.to({}, { duration: 0.25 });
         tl.call(() => { if (isTLPaused.current === true) tl.pause(); });
-        removeOverlayTL(tl, o);
+        removeOverlayTL(o, tl);
     }
 
     setValueTL(value, index, getEl, tl);
@@ -28,23 +49,21 @@ export const insertionTL = (
 
 }
 
-export const deletionTL = (
-    array: DataItem[],
-    index: number,
-    getEl: GetElementByIndex,
-    isTLPaused: RefObject<boolean>
+export const deletionArrayTL = (
+    { array, index, getEl, isTLPaused }: AlgorithmParams,
 
 ): GSAPTimeline => {
+    index = verifyParam(index);
     if (index >= array.length) {
         throw new Error(`Index ${index} out of bounds`);
     }
     const tl = gsap.timeline();
     for (let i = index + 1; i < array.length; i++) {
-        const o = highlightTL(tl, i, getEl, "orange");
+        const o = highlightArrayTL(getEl(i), "orange", tl);
         shiftTL(array, i, -1, getEl, tl, isTLPaused);
         tl.to({}, { duration: 0.25 });
         tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
-        removeOverlayTL(tl, o);
+        removeOverlayTL(o, tl);
     }
 
     setValueTL(0, array.length - 1, getEl, tl);
@@ -53,37 +72,32 @@ export const deletionTL = (
 }
 
 export const linearSearchTL = (
-    array: DataItem[],
-    value: number,
-    getEl: GetElementByIndex,
-    isTLPaused: RefObject<boolean>
+    { array, value, getEl, isTLPaused }: AlgorithmParams,
 ) => {
-
+    value = verifyParam(value);
     const tl = gsap.timeline();
     let compHighlight;
     for (let i = 0; i < array.length; i++) {
-        const o = highlightTL(tl, i, getEl, "yellow");
+        const o = highlightArrayTL(getEl(i), "yellow", tl);
         if (array[i].val === value) {
-            compHighlight = highlightTL(tl, i, getEl, "green");
+            compHighlight = highlightArrayTL(getEl(i), "green", tl);
             break;
         } else {
-            compHighlight = highlightTL(tl, i, getEl, "red");
+            compHighlight = highlightArrayTL(getEl(i), "red", tl);
         }
         tl.to({}, { duration: 0.25 });
         tl.call(() => { if (isTLPaused.current === true) tl.pause(); });
-        removeOverlayTL(tl, o);
-        removeOverlayTL(tl, compHighlight);
+        removeOverlayTL(o, tl);
+        removeOverlayTL(compHighlight, tl);
     }
     return tl;
 }
 
 export const binarySearchTL = (
-    array: DataItem[],
-    value: number,
-    getEl: GetElementByIndex,
-    isTLPaused: RefObject<boolean>
+    { array, value, getEl, isTLPaused }: AlgorithmParams,
 ) => {
 
+    value = verifyParam(value);
     const tl = gsap.timeline();
     let compHighlight;
     let i = 0;
@@ -91,27 +105,29 @@ export const binarySearchTL = (
     while (i <= j) {
         const mid = Math.floor((i + j) / 2);
 
-        const o1 = highlightTL(tl, i, getEl, "yellow");
-        const o2 = highlightTL(tl, j, getEl, "orange", "<");
-        const o3 = highlightTL(tl, mid, getEl, "blue", "<");
+        const o1 = highlightArrayTL(getEl(i), "yellow", tl);
+        const o2 = highlightArrayTL(getEl(j), "orange", tl, "<");
+        const o3 = highlightArrayTL(getEl(mid), "blue", tl, "<");
 
         tl.to({}, { duration: 0.25 });
         tl.call(() => { if (isTLPaused.current === true) tl.pause(); });
 
+        let found = false;
         if (array[mid].val === value) {
-            compHighlight = highlightTL(tl, mid, getEl, "green");
-            break;
+            compHighlight = highlightArrayTL(getEl(mid), "green", tl);
+            found = true;
         } else {
-            compHighlight = highlightTL(tl, mid, getEl, "red");
+            compHighlight = highlightArrayTL(getEl(mid), "red", tl);
         }
 
         tl.to({}, { duration: 0.25 });
         tl.call(() => { if (isTLPaused.current === true) tl.pause(); });
 
-        removeOverlayTL(tl, o1);
-        removeOverlayTL(tl, o2, "<");
-        removeOverlayTL(tl, o3, "<");
-        removeOverlayTL(tl, compHighlight, "<");
+        removeOverlayTL(o1, tl);
+        removeOverlayTL(o2, tl, "<");
+        removeOverlayTL(o3, tl, "<");
+        if (found) break;
+        removeOverlayTL(compHighlight, tl, "<");
         if (array[mid].val < value) {
             i = mid + 1;
         } else {
@@ -122,29 +138,28 @@ export const binarySearchTL = (
 }
 
 export const bubbleSortTL = (
-    array: DataItem[],
-    getEl: GetElementByIndex,
-    isTLPaused: RefObject<boolean>
+    { array, getEl, isTLPaused }: AlgorithmParams,
+
 ): GSAPTimeline => {
     const tl = gsap.timeline();
     for (let i = 0; i < array.length - 1; i++) {
         for (let j = 0; j < array.length - 1 - i; j++) {
 
             // add < at the end to synchronize with the previous 
-            const o1 = highlightTL(tl, j, getEl, "yellow");
-            const o2 = highlightTL(tl, j + 1, getEl, "orange", "<");
+            const o1 = highlightArrayTL(getEl(j), "yellow", tl);
+            const o2 = highlightArrayTL(getEl(j + 1), "orange", tl, "<");
 
             // wait
             tl.to({}, { duration: 0.25 });
             tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
 
-            const isGT = compareGTTL(tl, j, j + 1, array, getEl, isTLPaused);
+            const isGT = compareGTTL(j, j + 1, array, getEl, tl, isTLPaused);
             if (isGT) {
                 swapTL(array, j, j + 1, getEl, tl, isTLPaused);
             }
 
-            removeOverlayTL(tl, o1);
-            removeOverlayTL(tl, o2, "<");
+            removeOverlayTL(o1, tl);
+            removeOverlayTL(o2, tl, "<");
         }
     }
 
@@ -152,9 +167,7 @@ export const bubbleSortTL = (
 };
 
 export const insertionSortTL = (
-    array: DataItem[],
-    getEl: GetElementByIndex,
-    isTLPaused: RefObject<boolean>
+    { array, getEl, isTLPaused }: AlgorithmParams,
 ): GSAPTimeline => {
     const tl = gsap.timeline();
 
@@ -162,24 +175,24 @@ export const insertionSortTL = (
         let j = i;
 
         while (j > 0) {
-            const o1 = highlightTL(tl, j, getEl, "yellow");
-            const o2 = highlightTL(tl, j - 1, getEl, "orange", "<");
+            const o1 = highlightArrayTL(getEl(j), "yellow", tl);
+            const o2 = highlightArrayTL(getEl(j - 1), "orange", tl, "<");
 
             tl.to({}, { duration: 0.25 });
             tl.call(() => { if (isTLPaused.current) tl.pause(); });
 
-            const isGT = compareGTTL(tl, j - 1, j, array, getEl, isTLPaused);
+            const isGT = compareGTTL(j - 1, j, array, getEl, tl, isTLPaused);
 
             if (!isGT) {
-                removeOverlayTL(tl, o1);
-                removeOverlayTL(tl, o2, "<");
+                removeOverlayTL(o1, tl);
+                removeOverlayTL(o2, tl, "<");
                 break;
             }
 
             swapTL(array, j - 1, j, getEl, tl, isTLPaused);
 
-            removeOverlayTL(tl, o1);
-            removeOverlayTL(tl, o2, "<");
+            removeOverlayTL(o1, tl);
+            removeOverlayTL(o2, tl, "<");
 
             j--;
         }
@@ -190,18 +203,16 @@ export const insertionSortTL = (
 
 // fix this, AI did bad job
 export const selectionSortTL = (
-    array: DataItem[],
-    getEl: GetElementByIndex,
-    isTLPaused: RefObject<boolean>
+    { array, getEl, isTLPaused }: AlgorithmParams,
 ): GSAPTimeline => {
     const tl = gsap.timeline();
 
     for (let i = 0; i < array.length - 1; i++) {
         let minIndex = i;
-        const o1 = highlightTL(tl, i, getEl, "yellow");
-        let minHighlight = highlightTL(tl, minIndex, getEl, "blue");
+        const o1 = highlightArrayTL(getEl(i), "yellow", tl);
+        let minHighlight = highlightArrayTL(getEl(minIndex), "blue", tl);
         for (let j = i + 1; j < array.length; j++) {
-            const o2 = highlightTL(tl, j, getEl, "orange");
+            const o2 = highlightArrayTL(getEl(j), "orange", tl);
 
             tl.to({}, { duration: 0.25 });
             tl.call(() => { if (isTLPaused.current) tl.pause(); });
@@ -210,17 +221,17 @@ export const selectionSortTL = (
 
             if (isGT) {
                 minIndex = j;
-                removeOverlayTL(tl, minHighlight);
-                minHighlight = highlightTL(tl, minIndex, getEl, "blue");
+                removeOverlayTL(minHighlight, tl);
+                minHighlight = highlightArrayTL(getEl(minIndex), "blue", tl);
             }
 
-            removeOverlayTL(tl, o2);
+            removeOverlayTL(o2, tl);
             tl.to({}, { duration: 0.25 });
             tl.call(() => { if (isTLPaused.current) tl.pause(); });
 
         }
-        removeOverlayTL(tl, o1, "<");
-        removeOverlayTL(tl, minHighlight, "<");
+        removeOverlayTL(o1, tl, "<");
+        removeOverlayTL(minHighlight, tl, "<");
 
         if (minIndex !== i) {
             swapTL(array, i, minIndex, getEl, tl, isTLPaused);
@@ -273,7 +284,7 @@ const mergeSplitArray = (
         const tempColor = highlightTempRectTL(movedObj.rect, "green", tl);
         tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
         highlightTempRectTL(movedObj.rect, tempColor, tl);
-        tl.to({}, {duration:0.25});
+        tl.to({}, { duration: 0.25 });
         moveAndSetText(array, k, targetVal, movedObj.text, trueText, tl, isTLPaused);
         highlightTempRectTL(movedObj.rect, ogColor, tl);
         k += 1;
@@ -314,29 +325,34 @@ const mergeSplitArray = (
 }
 
 export const mergeSortTL = (
-    array: DataItem[],
-    getEl: GetElementByIndex,
-    isTLPaused: RefObject<boolean>
+    { array, getEl, isTLPaused }: AlgorithmParams,
 ): GSAPTimeline => {
     const tl = gsap.timeline();
 
     const n = array.length;
 
-// const tempArray = createSplitArrayTL(2, array.length, getEl, tl, isTLPaused);
+    // const tempArray = createSplitArrayTL(2, array.length, getEl, tl, isTLPaused);
     for (let size = 1; size < n; size *= 2) {
-        const tempArray = createSplitArrayTL(array, size,  getEl, tl, isTLPaused);
+        const tempArray = createSplitArrayTL(array, size, getEl, tl, isTLPaused);
         for (let left = 0; left < n; left += 2 * size) {
             const mid = Math.min(left + size, n);
             const right = Math.min(left + 2 * size, n);
             mergeSplitArray(array, left, mid, right, tempArray, getEl, tl, isTLPaused);
         }
-        tl.to({}, {duration: 0.25});
+        tl.to({}, { duration: 0.25 });
         removeSplitArrayTL(tempArray, tl);
     }
 
     return tl;
 }
 
-export const mergeSortCleaner = () => {
-
-}
+export const arrayAnimBuilder = {
+    insertion: insertionArrayTL,
+    deletion: deletionArrayTL,
+    linearSearch: linearSearchTL,
+    binarySearch: binarySearchTL,
+    bubbleSort: bubbleSortTL,
+    selectionSort: selectionSortTL,
+    insertionSort: insertionSortTL,
+    mergeSort: mergeSortTL,
+};
