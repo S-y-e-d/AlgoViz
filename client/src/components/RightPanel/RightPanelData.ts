@@ -121,6 +121,35 @@ export const algoInfoMap: AlgoMap = {
         },
     },
 
-    list: {},
+    list: {
+        insertion: {
+            name: "Linked List Insertion",
+            pseudocode: `1. create new node with value
+2. if inserting at head:
+3.   newNode.next = head
+4.   head = newNode
+5. else:
+6.   traverse to (index - 1)
+7.   newNode.next = current.next
+8.   current.next = newNode`,
+            time: "O(n)",
+            space: "O(1)",
+            description:
+                "Insertion in a linked list involves updating pointers. Unlike arrays, elements do not need to be shifted, but traversal to the insertion point may be required.",
+        },
+
+        deletion: {
+            name: "Linked List Deletion",
+            pseudocode: `1. if deleting head:
+2.   head = head.next
+3. else:
+4.   traverse to (index - 1)
+5.   current.next = current.next.next`,
+            time: "O(n)",
+            space: "O(1)",
+            description:
+                "Deletion in a linked list is done by updating pointers to skip the target node. Traversal is needed to reach the node before the one being deleted.",
+        },
+    },
     tree: {},
 };
