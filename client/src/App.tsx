@@ -13,14 +13,16 @@ export type AlgoType =
   | "selectionSort"
   | "mergeSort";
 
-export type GetElementByIndex = (index: number) => SVGGElement | null;
+export type GetNodeByIndex = (index: number) => SVGGElement | null;
+export type GetEdgeByIndex = (index: number) => SVGLineElement | null;
+
 export type DataItem = {
   val: number,
   id: string,
 }
 
 type NodeRefs = {
-  current: Map<number, SVGGElement>;
+  current: Map<number, NodeGroup>;
 };
 export type ViewProps = {
   size: number;
@@ -32,11 +34,14 @@ export type AlgorithmParams = {
   array: DataItem[];
   value?: number;
   index?: number;
-  getEl: GetElementByIndex;
+  getNode: GetNodeByIndex;
+  getEdge: GetEdgeByIndex;
   isTLPaused: React.RefObject<boolean>;
 }
 
 export type ColorType = "yellow" | "orange" | "red" | "green" | "blue";
+
+export type NodeGroup = {node: SVGGElement | null, edge: SVGLineElement | null};
 
 function App() {
   return (

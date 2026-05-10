@@ -3,6 +3,36 @@ import type { ViewProps } from "../../App";
 export const ListView = ({ size, data, nodeRefs }: ViewProps) => {
     const dataCopy = data.filter(item => !isNaN(item.val));
 
+    const setNodeRef = (index: number, el: SVGGElement | null) => {
+        const existing = nodeRefs.current.get(index);
+        let edge = null;
+        if(existing) 
+            edge = existing.edge;
+
+        if (el) {
+            nodeRefs.current.set(index, {node: el, edge: edge });
+        } else {
+            if(existing)
+                existing.node = null;
+            if (!existing?.edge) nodeRefs.current.delete(index);
+        }
+    }
+
+    const setEdgeRef = (index: number, el: SVGLineElement | null) => {
+        const existing = nodeRefs.current.get(index);
+        let node = null;
+        if (existing)
+            node = existing.node;
+        
+
+        if (el) {
+            nodeRefs.current.set(index, {node: node, edge: el});
+        } else {
+            if(existing)
+                existing.edge = null;
+            if (!existing?.node) nodeRefs.current.delete(index);
+        }
+    }
     return (
         <>
             {
@@ -19,12 +49,7 @@ export const ListView = ({ size, data, nodeRefs }: ViewProps) => {
                     return (
                         <g key={item.id}>
                             <g
-                                ref={(el) => {
-                                    if (el)
-                                        nodeRefs.current.set(index, el);
-                                    else
-                                        nodeRefs.current.delete(index);
-                                }}
+                                ref={(e) => setNodeRef(index, e)}
                                 transform={`translate(${x}, ${y})`}
                             >
                                 <circle
@@ -41,9 +66,10 @@ export const ListView = ({ size, data, nodeRefs }: ViewProps) => {
                             </g>
                             {index < dataCopy.length - 1 &&
                                 <line
+                                    ref={(e) => setEdgeRef(index, e)}
                                     x1={x + size / 2}
                                     y1={y}
-                                    x2={x+ 3 * size / 2}
+                                    x2={x + 3 * size / 2}
                                     y2={y}
                                     markerEnd="url(#arrow)"
                                 />}

@@ -19,7 +19,7 @@ export const ArrayView = ({ size, data, nodeRefs }: ViewProps) => {
           return (
             <g key={item.id} ref={(el) => {
               if (el)
-                nodeRefs.current.set(index, el);
+                nodeRefs.current.set(index, {node: el, edge: null});
               else
                 nodeRefs.current.delete(index);
             }}>

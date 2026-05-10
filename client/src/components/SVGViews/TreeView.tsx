@@ -122,7 +122,10 @@ export const TreeView = ({ size, data }: ViewProps) => {
                     const { x1, y1, x2, y2 } = edgeLine(x, y, px, py, size / 2);
                     console.log(data)
                     return (
-                        <g key={item.id}>
+                        <g
+                            key={item.id}
+                            transform={`translate(${x}, ${y})`}
+                        >
                             <circle r={size / 2} cx={x} cy={y} />
                             <text
                                 x={x}

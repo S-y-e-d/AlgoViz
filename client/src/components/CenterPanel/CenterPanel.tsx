@@ -2,13 +2,13 @@ import { ArrayView } from "../SVGViews/ArrayView";
 import { ListView } from "../SVGViews/ListView";
 import { TreeView } from "../SVGViews/TreeView";
 
-import type { DataItem, StructureType } from "../../App";
+import type { DataItem, NodeGroup, StructureType } from "../../App";
 import type { ViewProps } from "../../App";
 
 type CenterPanelProps = {
   data: DataItem[];
   structure: StructureType;
-  nodeRefs: React.RefObject<Map<number, SVGGElement>>;
+  nodeRefs: React.RefObject<Map<number, NodeGroup>>;
   size: number;
 }
 export function CenterPanel({
@@ -24,6 +24,7 @@ export function CenterPanel({
     list: ListView,
     tree: TreeView,
   } satisfies Record<StructureType, React.FC<ViewProps>>;
+
   const ViewComponent = structureMap[structure];
 
 

@@ -4,7 +4,7 @@ import { CenterPanel } from "../components/CenterPanel/CenterPanel.tsx";
 import { RightPanel } from "../components/RightPanel/RightPanel.tsx";
 import { TopBar } from "../components/TopBar/TopBar.tsx"
 import { BottomBar } from "../components/BottomBar/BottomBar.tsx"
-import { type AlgoType, type DataItem, type StructureType } from "../App.tsx";
+import { type AlgoType, type DataItem, type NodeGroup, type StructureType } from "../App.tsx";
 
 export const VisualizerPage = () => {
   // const [msg, setMsg] = useState("");
@@ -44,7 +44,7 @@ export const VisualizerPage = () => {
   const [algorithm, setAlgoritm] = useState<AlgoType>("insertion");
 
 
-  const nodeRefs = useRef<Map<number, SVGGElement>>(new Map());
+  const nodeRefs = useRef<Map<number, NodeGroup>>(new Map());
 
   const isTLPaused = useRef<boolean>(true);
   const setTLPaused = (b: boolean) => {

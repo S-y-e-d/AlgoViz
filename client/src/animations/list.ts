@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import { connectNodesTL, createNewListNode, highlightNextTL, highlightNodeTL, MissingElementError, moveNodeTL, readjustListPositions as adjustListInsertionTL, deleteNodeListTL, adjustListDeletionTL } from "./helper";
+import { connectNodesTL, createNewListNode, highlightNextTL, highlightNodeTL, MissingElementError, moveNodeTL, adjustListInsertionTL, deleteNodeListTL, adjustListDeletionTL } from "./helper";
 import type { AlgorithmParams, ColorType } from "../App";
 
 const verifyParam = (param: number | undefined) => {
@@ -9,7 +9,7 @@ const verifyParam = (param: number | undefined) => {
 }
 
 const insertListTL = (
-    { array, value, index, getEl, isTLPaused }: AlgorithmParams,
+    { array, value, index, getNode, getEdge, isTLPaused }: AlgorithmParams,
 ): GSAPTimeline => {
 
     value = verifyParam(value);
@@ -20,29 +20,29 @@ const insertListTL = (
 
     const tl = gsap.timeline();
 
-    const head = getEl(0);
+    const head = getNode(0);
     if (!head)
         throw new MissingElementError("Empty list");
 
     const originalColor = gsap.getProperty(head.querySelector("circle"), "stroke") as ColorType;
 
     highlightNodeTL(head, "yellow", tl);
-    const temp = createNewListNode(value, getEl, tl, isTLPaused);
+    const temp = createNewListNode(value, getNode, tl, isTLPaused);
 
     // travel to the target
     for (let i = 0; i < index - 1; i++) {
 
-        const next = getEl(i + 1);
+        const next = getNode(i + 1);
         const x = gsap.getProperty(next, "x") as number;
         tl.addLabel("moveStep");
-        highlightNextTL(getEl(i), next, originalColor, "yellow", tl, isTLPaused, "moveStep");
+        highlightNextTL(getNode(i), getEdge(i), next, originalColor, "yellow", tl, isTLPaused, "moveStep");
         moveNodeTL(temp, { x }, tl, "moveStep");
         tl.to({}, { duration: 0.25 });
     }
 
     // connect node pointers
-    const prev = getEl(index - 1);
-    const next = getEl(index);
+    const prev = getNode(index - 1);
+    const next = getNode(index);
     if (next)
         connectNodesTL(temp, next, tl, isTLPaused);
     // combine the two things, so we can connect both nodes
@@ -50,15 +50,15 @@ const insertListTL = (
 
     if (prev)
         connectNodesTL(prev, temp, tl, isTLPaused);
-    highlightNodeTL(getEl(index - 1) as SVGGElement, originalColor, tl);
+    highlightNodeTL(getNode(index - 1) as SVGGElement, originalColor, tl);
 
-    adjustListInsertionTL(array, index, temp, getEl, tl);
+    adjustListInsertionTL(array, index, temp, getNode, getEdge, tl);
 
     return tl;
 }
 
 const deletionListTL = (
-    { array, index, getEl, isTLPaused }: AlgorithmParams
+    { array, index, getNode, getEdge, isTLPaused }: AlgorithmParams
 ): GSAPTimeline => {
 
     index = verifyParam(index);
@@ -67,7 +67,7 @@ const deletionListTL = (
 
     const tl = gsap.timeline();
 
-    const head = getEl(0) as SVGGElement;
+    const head = getNode(0) as SVGGElement;
     if (!head)
         throw new MissingElementError("Empty list");
 
@@ -79,16 +79,16 @@ const deletionListTL = (
     // traverse
     for (let i = 0; i < index - 1; i++) {
 
-        const next = getEl(i + 1);
+        const next = getNode(i + 1);
         tl.addLabel("moveStep");
-        highlightNextTL(getEl(i), next, originalColor, "yellow", tl, isTLPaused, "moveStep");
+        highlightNextTL(getNode(i), getEdge(i), next, originalColor, "yellow", tl, isTLPaused, "moveStep");
         tl.to({}, { duration: 0.25 });
     }
 
-    deleteNodeListTL(array, index, getEl, tl, isTLPaused);
+    deleteNodeListTL(array, index, getNode, getEdge, tl, isTLPaused);
     tl.to({}, { duration: 0.25 });
 
-    adjustListDeletionTL(array, index, getEl, tl);
+    adjustListDeletionTL(array, index, getNode, getEdge, tl);
 
     return tl;
 }

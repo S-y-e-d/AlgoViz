@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import type { ColorType, DataItem, GetElementByIndex } from "../App";
+import type { ColorType, DataItem, GetEdgeByIndex, GetNodeByIndex } from "../App";
 import type { RefObject } from "react";
 
 export class MissingElementError extends Error {
@@ -97,15 +97,15 @@ export const compareGTTL = (
     i: number,
     j: number,
     array: DataItem[],
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
     tl: GSAPTimeline,
     isTLPaused: RefObject<boolean>,
 ) => {
     const isGreater = array[i].val > array[j].val;
     const color = isGreater ? "red" : "green";
 
-    const o1 = highlightArrayTL(getEl(i), color, tl);
-    const o2 = highlightArrayTL(getEl(j), color, tl, "<");
+    const o1 = highlightArrayTL(getNode(i), color, tl);
+    const o2 = highlightArrayTL(getNode(j), color, tl, "<");
 
     tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
 
@@ -122,12 +122,12 @@ export const swapTL = (
     array: DataItem[],
     i: number,
     j: number,
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
     tl: GSAPTimeline,
     isTLPaused: RefObject<boolean>,
 ) => {
-    const el1 = getEl(i);
-    const el2 = getEl(j);
+    const el1 = getNode(i);
+    const el2 = getNode(j);
 
     if (!el1)
         throw new MissingElementError(`No element at index ${i}`);
@@ -172,12 +172,12 @@ export const shiftTL = (
     array: DataItem[],
     index: number,
     offset: number,
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
     tl: GSAPTimeline,
     isTLPaused: RefObject<boolean>
 ) => {
-    const el1 = getEl(index);
-    const el2 = getEl(index + offset);
+    const el1 = getNode(index);
+    const el2 = getNode(index + offset);
 
     if (!el1)
         throw new MissingElementError(`No element at index ${index}`);
@@ -212,10 +212,10 @@ export const shiftTL = (
 export const setValueTL = (
     value: number,
     index: number,
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
     tl: GSAPTimeline,
 ) => {
-    const target = getEl(index);
+    const target = getNode(index);
     if (!target)
         throw new MissingElementError(`No element at index ${target}`);
 
@@ -254,7 +254,7 @@ export type ClonedGroup = {
 // export const createSplitArrayTL = (
 //     array: DataItem[],
 //     splitSize: number,
-//     getEl: GetElementByIndex,
+//     getNode: GetNodeByIndex,
 //     tl: GSAPTimeline,
 //     isTLPaused: RefObject<boolean>,
 // ): ClonedGroup[] => {
@@ -263,7 +263,7 @@ export type ClonedGroup = {
 //     if (!canvas)
 //         throw new MissingElementError("Where did the canvas go");
 
-//     const temp = getEl(0)?.querySelector("rect");
+//     const temp = getNode(0)?.querySelector("rect");
 //     if (!temp)
 //         throw new MissingElementError("Nothing it index 0");
 
@@ -275,7 +275,7 @@ export type ClonedGroup = {
 //     let currentX = startX;
 //     const Y = gsap.getProperty(temp, "y") as number - 2 * rectSize;
 //     for (let i = 0; i < array.length; i++) {
-//         const group = getEl(i);
+//         const group = getNode(i);
 //         if (!group)
 //             throw new MissingElementError("Could not split, array missing cell");
 //         const rect = group.querySelector("rect");
@@ -331,7 +331,7 @@ export type ClonedGroup = {
 export const createSplitArrayTL = (
     array: DataItem[],
     splitSize: number,
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
     tl: GSAPTimeline,
     isTLPaused: RefObject<boolean>,
 ): ClonedGroup[] => {
@@ -341,7 +341,7 @@ export const createSplitArrayTL = (
     if (!canvas)
         throw new MissingElementError("Where did the canvas go");
 
-    const temp = getEl(0)?.querySelector("rect");
+    const temp = getNode(0)?.querySelector("rect");
     if (!temp)
         throw new MissingElementError("Nothing at index 0");
 
@@ -367,7 +367,7 @@ export const createSplitArrayTL = (
     const Y = (gsap.getProperty(temp, "y") as number) - 2 * rectSize;
 
     for (let i = 0; i < array.length; i++) {
-        const group = getEl(i);
+        const group = getNode(i);
         if (!group)
             throw new MissingElementError("Could not split, array missing cell");
 
@@ -550,12 +550,12 @@ export const highlightListTL = (
 
 export const createNewListNode = (
     value: number,
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
     tl: GSAPTimeline,
     isTLPaused: RefObject<boolean>,
 ): SVGGElement => {
 
-    const head = getEl(0);
+    const head = getNode(0);
     if (!head)
         throw new MissingElementError("Empty list");
 
@@ -588,16 +588,19 @@ export const createNewListNode = (
 }
 
 const animateArrowTL = (
-    current: SVGGElement,
+    currentEdge: SVGLineElement | null,
     tl: GSAPTimeline,
     position?: string | undefined,
 ) => {
-    const line = current.parentElement?.querySelector("line") as SVGLineElement;
-    line.classList.add("temp");
+    // const line = current.parentElement?.querySelector("line") as SVGLineElement;
+    if(!currentEdge)
+        throw new MissingElementError("Missing edge when animating arrow");
 
-    const clone = line.cloneNode(false) as SVGLineElement;
-    line.after(clone);
-    const length = line.getTotalLength();
+    currentEdge.classList.add("temp");
+
+    const clone = currentEdge.cloneNode(false) as SVGLineElement;
+    currentEdge.after(clone);
+    const length = currentEdge.getTotalLength();
 
     tl.fromTo(clone,
         {
@@ -658,6 +661,7 @@ export const moveNodeTL = (
 
 export const highlightNextTL = (
     current: SVGGElement | null,
+    currentEdge: SVGLineElement | null,
     next: SVGGElement | null,
     originalColor: ColorType,
     highlightColor: ColorType,
@@ -676,7 +680,7 @@ export const highlightNextTL = (
 
     tl.addLabel(position as string);
 
-    animateArrowTL(current, tl, "<");
+    animateArrowTL(currentEdge, tl, "<");
 
     highlightNodeTL(next, highlightColor, tl);
 
@@ -706,12 +710,6 @@ export const connectNodesTL = (
     }
 
     if (!line) {
-        if (!from.classList.contains("temp")) {
-            console.log(line);
-            console.log(parent);
-            console.log(from);
-
-        }
         line = document.createElementNS(
             "http://www.w3.org/2000/svg",
             "line"
@@ -768,23 +766,25 @@ export const connectNodesTL = (
 
 }
 
-export const readjustListPositions = (
+export const adjustListInsertionTL = (
     array: DataItem[],
     targetIdx: number,
     newNode: SVGGElement,
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
+    getEdge: GetEdgeByIndex,
     tl: GSAPTimeline,
 ) => {
 
-    const stagger = 0.125;
+    const stagger = 0.1;
     let overlap = stagger;
-    const circ = getEl(0)?.querySelector("circle") as SVGCircleElement;
+    const circ = getNode(0)?.querySelector("circle") as SVGCircleElement;
     if (!circ)
         throw new MissingElementError("No circ");
     const r = gsap.getProperty(circ, "r") as number;
 
+    // move all the elements to make space for the new node
     for (let i = 0; i < targetIdx; i++) {
-        const el = getEl(i) as SVGGElement;
+        const el = getNode(i) as SVGGElement;
         const x = gsap.getProperty(el, "x") as number - 2 * r;
         const y = gsap.getProperty(el, "y") as number;
 
@@ -798,7 +798,7 @@ export const readjustListPositions = (
         );
         overlap += stagger;
 
-        const nextLine = el.parentElement?.querySelector("line") as SVGLineElement;
+        const nextLine = getEdge(i);
         if (nextLine) {
             tl.to(
                 nextLine,
@@ -809,7 +809,7 @@ export const readjustListPositions = (
                 "<"
             )
         }
-        const prevLine = getEl(i - 1)?.parentElement?.querySelector("line") as SVGLineElement;
+        const prevLine = getEdge(i-1);
         if (prevLine) {
             tl.to(
                 prevLine,
@@ -824,7 +824,7 @@ export const readjustListPositions = (
 
     overlap = stagger;
     for (let i = array.length - 1; i >= targetIdx; i--) {
-        const el = getEl(i) as SVGGElement;
+        const el = getNode(i) as SVGGElement;
         const circ = el.querySelector("circle") as SVGCircleElement;
         if (!circ)
             throw new MissingElementError("No circ");
@@ -836,12 +836,11 @@ export const readjustListPositions = (
             x: x, y: y,
             duration: 0.25,
         },
-            // i === array.length - 1 ? "move" : `-=${overlap}`
             i === array.length - 1 ? "move" : `move+=${overlap}`
         );
         overlap += stagger;
 
-        const line = el.parentElement?.querySelector("line") as SVGLineElement;
+        const line = getEdge(i) ;
         if (line) {
             tl.to(
                 line,
@@ -853,9 +852,9 @@ export const readjustListPositions = (
             )
         }
 
-        const prevLine = getEl(i - 1)?.parentElement?.querySelector("line") as SVGLineElement ??
+        const prevLine = getEdge(i-1) ??
             newNode.parentElement?.querySelector(".temp-line") as SVGLineElement;
-        // const prevLine = getEl(i - 1)?.parentElement?.querySelector("line") as SVGLineElement;
+        // const prevLine = getNode(i - 1)?.parentElement?.querySelector("line") as SVGLineElement;
         if (prevLine && i !== targetIdx || targetIdx === 0) {
             tl.to(
                 prevLine,
@@ -875,29 +874,29 @@ export const readjustListPositions = (
     let x;
     let nextLine;
     let prevLine;
-    const y = gsap.getProperty(getEl(0) as SVGGElement, "y") as number;
-    console.log(y);
+    const y = gsap.getProperty(getNode(0) as SVGGElement, "y") as number;
     if (targetIdx === 0) {
-        x = gsap.getProperty(getEl(0), "x") as number - 2 * r;
+        x = gsap.getProperty(getNode(0), "x") as number - 2 * r;
         nextLine = tempLine;
         prevLine = null;
     } else if (targetIdx === array.length) {
-        x = gsap.getProperty(getEl(array.length - 1), "x") as number + 2 * r;
+        x = gsap.getProperty(getNode(array.length - 1), "x") as number + 2 * r;
         nextLine = null;
         prevLine = tempLine;
     } else {
-        const prev = getEl(targetIdx - 1);
+        const prev = getNode(targetIdx - 1);
         if (!prev)
             throw new MissingElementError("Pervious not found");
         x = gsap.getProperty(prev, "x") as number + 2 * r;
         nextLine = tempLine;
-        prevLine = prev.parentElement?.querySelector("line") as SVGLineElement;
+        prevLine = getEdge(targetIdx-1);
         if (!prevLine)
             throw new MissingElementError("Pervious Line not found");
     }
-    console.log(nextLine);
-    console.log(prevLine);
+    // console.log(nextLine);
+    // console.log(prevLine);
 
+    if(nextLine)
     tl.to(nextLine, {
         attr: {
             x2: x + 3 * r,
@@ -906,6 +905,16 @@ export const readjustListPositions = (
         duration: 0.25,
     }, "<")
 
+    if(prevLine)
+    tl.to(prevLine, {
+        attr: {
+            x1: x - 3*r,
+            y1: y,
+        },
+        duration: 0.25,
+    }, targetIdx === array.length ? "<" : undefined);
+
+    if(nextLine)
     tl.to(nextLine, {
         attr: {
             x1: x + r,
@@ -915,6 +924,7 @@ export const readjustListPositions = (
     },)
 
 
+    if(prevLine)
     tl.to(prevLine, {
         attr: {
             x2: x - r,
@@ -933,12 +943,13 @@ export const readjustListPositions = (
 export const deleteNodeListTL = (
     array: DataItem[],
     index: number,
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
+    getEdge: GetEdgeByIndex,
     tl: GSAPTimeline,
     isTLPaused: RefObject<boolean>,
 ) => {
 
-    const toDeleteNode = getEl(index) as SVGGElement;
+    const toDeleteNode = getNode(index) as SVGGElement;
     if (!toDeleteNode)
         throw new MissingElementError("Target node not found");
 
@@ -948,12 +959,12 @@ export const deleteNodeListTL = (
 
     let prevLine, nextLine;
     if (index > 0) {
-        prevLine = getEl(index - 1)?.parentElement?.querySelector("line");
+        prevLine = getEdge(index - 1);
         if (!prevLine)
             throw new MissingElementError("Previous line not found");
     }
     if (index < array.length - 1) {
-        nextLine = getEl(index)?.parentElement?.querySelector("line");
+        nextLine = getEdge(index);
         if (!nextLine)
             throw new MissingElementError("Next line not found");
     }
@@ -981,7 +992,7 @@ export const deleteNodeListTL = (
     tl.to({}, { duration: 0.25 });
 
     if (index > 0 && index < array.length - 1) {
-        connectNodesTL(getEl(index - 1), getEl(index + 1), tl, isTLPaused);
+        connectNodesTL(getNode(index - 1), getNode(index + 1), tl, isTLPaused);
         tl.to({}, { duration: 0.25 });
     }
 
@@ -1023,18 +1034,19 @@ export const deleteNodeListTL = (
 export const adjustListDeletionTL = (
     array: DataItem[],
     index: number,
-    getEl: GetElementByIndex,
+    getNode: GetNodeByIndex,
+    getEdge: GetEdgeByIndex,
     tl: GSAPTimeline,
 ) => {
 
     const stagger = 0.1;
     let overlap = stagger;
     const r = gsap.getProperty(
-        getEl(0)?.querySelector("circle") as SVGCircleElement, "r"
+        getNode(0)?.querySelector("circle") as SVGCircleElement, "r"
     ) as number;
 
     for (let i = index - 1; i >= 0; i--) {
-        const el = getEl(i) as SVGGElement;
+        const el = getNode(i) as SVGGElement;
         if (!el)
             throw new MissingElementError(`Missing at index ${i}`);
         tl.to(el, {
@@ -1043,8 +1055,8 @@ export const adjustListDeletionTL = (
         }, i === index - 1 ? "move" : `move+=${overlap}`);
         overlap += stagger;
 
-        const prevLine = getEl(i - 1)?.parentElement?.querySelector("line") as SVGLineElement;
-        const nextLine = getEl(i)?.parentElement?.querySelector("line") as SVGLineElement;
+        const prevLine = getEdge(i-1);
+        const nextLine = getEdge(i);
 
         if (prevLine) {
             tl.to(prevLine, {
@@ -1067,7 +1079,7 @@ export const adjustListDeletionTL = (
     overlap = stagger;
 
     for (let i = index + 1; i < array.length; i++) {
-        const el = getEl(i) as SVGGElement;
+        const el = getNode(i) as SVGGElement;
         if (!el)
             throw new MissingElementError(`Missing at index ${i}`);
         tl.to(el, {
@@ -1077,9 +1089,9 @@ export const adjustListDeletionTL = (
         overlap += stagger;
 
         const prevLine = i === index + 1
-            ? getEl(i - 2)?.parentElement?.querySelector("line") as SVGLineElement
-            : getEl(i - 1)?.parentElement?.querySelector("line") as SVGLineElement;
-        const nextLine = getEl(i)?.parentElement?.querySelector("line") as SVGLineElement;
+            ? getEdge(i-2)
+            : getEdge(i-1)
+        const nextLine = getEdge(i);
 
         if (prevLine) {
             tl.to(prevLine, {

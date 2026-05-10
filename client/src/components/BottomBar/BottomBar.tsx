@@ -2,15 +2,15 @@ import { useEffect, useRef, type RefObject } from "react"
 import gsap from "gsap";
 import SeekIcon from "../../assets/seek-icon.svg?react"
 import { Button } from "../Button/Button";
-import type { AlgorithmParams, AlgoType, DataItem, StructureType } from "../../App";
-import {  arrayAnimBuilder } from "../../animations/array";
+import type { AlgorithmParams, AlgoType, DataItem, NodeGroup, StructureType } from "../../App";
+import { arrayAnimBuilder } from "../../animations/array";
 import { listAnimBuilder } from "../../animations/list";
 
 type BottomBarProps = {
   data: DataItem[];
   valueData: string;
   indexData: string;
-  nodeRefs: RefObject<Map<number, SVGGElement>>;
+  nodeRefs: RefObject<Map<number, NodeGroup>>;
   structure: StructureType,
   algorithm: AlgoType;
   isTLPaused: RefObject<boolean>;
@@ -20,7 +20,17 @@ type BottomBarProps = {
 
 
 
-export function BottomBar({ data, valueData, indexData, nodeRefs, structure, algorithm, isTLPaused, setTLPaused, refreshData }: BottomBarProps) {
+export function BottomBar({
+  data,
+  valueData,
+  indexData,
+  nodeRefs,
+  structure,
+  algorithm,
+  isTLPaused,
+  setTLPaused,
+  refreshData
+}: BottomBarProps) {
 
   // function to set the timeline
   const tlRef = useRef<GSAPTimeline | null>(null);
@@ -65,20 +75,21 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, structure, alg
     let tl = null;
     const targetValueAlgorithms = ["insertion", "binarySearch", "linearSearch"];
     const targetIndexAlgorithms = ["deletion", "insertion",];
-    if(targetValueAlgorithms.includes(algorithm) && valueData === "")
+    if (targetValueAlgorithms.includes(algorithm) && valueData === "")
       return false;
-    if(targetIndexAlgorithms.includes(algorithm) && indexData === "")
+    if (targetIndexAlgorithms.includes(algorithm) && indexData === "")
       return false;
 
     const algorithmParams: AlgorithmParams = {
       array: [...data.filter(v => ~!isNaN(v.val))],
       value: valueData === "" ? undefined : Number(valueData),
       index: indexData === "" ? undefined : Number(indexData),
-      getEl: (i:number) => nodeRefs.current.get(i) ?? null,
+      getNode: (i: number) => nodeRefs.current.get(i)?.node ?? null,
+      getEdge: (i: number) => nodeRefs.current.get(i)?.edge ?? null,
       isTLPaused: isTLPaused,
     }
-    
-    switch(structure) {
+
+    switch (structure) {
       case "array":
         tl = arrayAnimBuilder[algorithm](algorithmParams);
         break;
@@ -106,7 +117,7 @@ export function BottomBar({ data, valueData, indexData, nodeRefs, structure, alg
 
 
     if (tlRef.current === null) {
-      if(setAlgorhtm() === false) 
+      if (setAlgorhtm() === false)
         return;
     }
     playButtonToggle();
