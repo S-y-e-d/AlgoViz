@@ -9,6 +9,12 @@ export class MissingElementError extends Error {
     }
 }
 
+export const verifyParam = (param: number | undefined) => {
+    if (param === undefined)
+        throw new Error("Missing parameter");
+    return param;
+}
+
 // create the highlight rect to avoid overlapping of lines in normal array structure
 const getHighlightOverlay = (rect: SVGRectElement): SVGRectElement => {
 
@@ -531,22 +537,6 @@ function edgeLine(
 
 /* ============ Linked List ============ */
 
-export const highlightListTL = (
-    node: SVGGElement,
-    tl: GSAPTimeline,
-    color: ColorType,
-    position?: string,
-) => {
-
-    if (!node)
-        throw new MissingElementError(`Missing node while highlighting`);
-
-    tl.to(node, {
-        stroke: color,
-        duration: 0.25,
-    }, position);
-
-}
 
 export const createNewListNode = (
     value: number,
@@ -587,13 +577,14 @@ export const createNewListNode = (
     return clone;
 }
 
-const animateArrowTL = (
+export const animateArrowTL = (
     currentEdge: SVGLineElement | null,
     tl: GSAPTimeline,
     position?: string | undefined,
+    reversed?: boolean,
 ) => {
     // const line = current.parentElement?.querySelector("line") as SVGLineElement;
-    if(!currentEdge)
+    if (!currentEdge)
         throw new MissingElementError("Missing edge when animating arrow");
 
     currentEdge.classList.add("temp");
@@ -602,22 +593,25 @@ const animateArrowTL = (
     currentEdge.after(clone);
     const length = currentEdge.getTotalLength();
 
+    let direction = 1;
+    if (reversed)
+        direction = -1;
     tl.fromTo(clone,
         {
             strokeDasharray: length,
-            strokeDashoffset: length,
+            strokeDashoffset: length * direction,
             stroke: "yellow",
         },
         {
             strokeDashoffset: 0,
-            duration: 0.125,
+            duration: 0.25,
             ease: "none"
         },
         position
     );
     tl.to(clone, {
-        strokeDashoffset: -length,
-        duration: 0.125,
+        strokeDashoffset: -length * direction,
+        duration: 0.25,
         ease: "none",
         onComplete: () => clone.remove(),
     });
@@ -809,7 +803,7 @@ export const adjustListInsertionTL = (
                 "<"
             )
         }
-        const prevLine = getEdge(i-1);
+        const prevLine = getEdge(i - 1);
         if (prevLine) {
             tl.to(
                 prevLine,
@@ -840,7 +834,7 @@ export const adjustListInsertionTL = (
         );
         overlap += stagger;
 
-        const line = getEdge(i) ;
+        const line = getEdge(i);
         if (line) {
             tl.to(
                 line,
@@ -852,7 +846,7 @@ export const adjustListInsertionTL = (
             )
         }
 
-        const prevLine = getEdge(i-1) ??
+        const prevLine = getEdge(i - 1) ??
             newNode.parentElement?.querySelector(".temp-line") as SVGLineElement;
         // const prevLine = getNode(i - 1)?.parentElement?.querySelector("line") as SVGLineElement;
         if (prevLine && i !== targetIdx || targetIdx === 0) {
@@ -889,50 +883,50 @@ export const adjustListInsertionTL = (
             throw new MissingElementError("Pervious not found");
         x = gsap.getProperty(prev, "x") as number + 2 * r;
         nextLine = tempLine;
-        prevLine = getEdge(targetIdx-1);
+        prevLine = getEdge(targetIdx - 1);
         if (!prevLine)
             throw new MissingElementError("Pervious Line not found");
     }
     // console.log(nextLine);
     // console.log(prevLine);
 
-    if(nextLine)
-    tl.to(nextLine, {
-        attr: {
-            x2: x + 3 * r,
-            y2: y,
-        },
-        duration: 0.25,
-    }, "<")
+    if (nextLine)
+        tl.to(nextLine, {
+            attr: {
+                x2: x + 3 * r,
+                y2: y,
+            },
+            duration: 0.25,
+        }, "<")
 
-    if(prevLine)
-    tl.to(prevLine, {
-        attr: {
-            x1: x - 3*r,
-            y1: y,
-        },
-        duration: 0.25,
-    }, targetIdx === array.length ? "<" : undefined);
+    if (prevLine)
+        tl.to(prevLine, {
+            attr: {
+                x1: x - 3 * r,
+                y1: y,
+            },
+            duration: 0.25,
+        }, targetIdx === array.length ? "<" : undefined);
 
-    if(nextLine)
-    tl.to(nextLine, {
-        attr: {
-            x1: x + r,
-            y1: y,
-        },
-        duration: 0.25,
-    },)
+    if (nextLine)
+        tl.to(nextLine, {
+            attr: {
+                x1: x + r,
+                y1: y,
+            },
+            duration: 0.25,
+        },)
 
 
-    if(prevLine)
-    tl.to(prevLine, {
-        attr: {
-            x2: x - r,
-            y2: y,
-        },
-        duration: 0.25,
+    if (prevLine)
+        tl.to(prevLine, {
+            attr: {
+                x2: x - r,
+                y2: y,
+            },
+            duration: 0.25,
 
-    }, "<")
+        }, "<")
 
     tl.to(newNode, {
         x: x, y: y, duration: 0.25,
@@ -1055,7 +1049,7 @@ export const adjustListDeletionTL = (
         }, i === index - 1 ? "move" : `move+=${overlap}`);
         overlap += stagger;
 
-        const prevLine = getEdge(i-1);
+        const prevLine = getEdge(i - 1);
         const nextLine = getEdge(i);
 
         if (prevLine) {
@@ -1089,8 +1083,8 @@ export const adjustListDeletionTL = (
         overlap += stagger;
 
         const prevLine = i === index + 1
-            ? getEdge(i-2)
-            : getEdge(i-1)
+            ? getEdge(i - 2)
+            : getEdge(i - 1)
         const nextLine = getEdge(i);
 
         if (prevLine) {
@@ -1112,4 +1106,54 @@ export const adjustListDeletionTL = (
     }
 
     return tl;
+}
+
+
+/* ============ Tree ============ */
+
+export const left = (current: number) => {
+    return current * 2 + 1;
+}
+export const right = (current: number) => {
+    return current * 2 + 2;
+}
+export const getParent = (current: number) => {
+    if (current === 0) return 0;
+    return Math.floor((current - 1) / 2)
+}
+
+export const displayTempNode = (
+    node: SVGGElement,
+    pos: { x: number, y: number },
+    tl: GSAPTimeline,
+) => {
+    const clone = node.cloneNode(true) as SVGGElement;
+    clone.setAttribute("opacity", "0");
+    clone.classList.add("temp");
+
+    node.parentElement?.after(clone);
+    tl.set(clone, {
+        x: pos.x,
+        y: pos.y,
+        opacity: 1,
+    });
+}
+
+export const getViewBoxLeftOffset = (svg: SVGSVGElement) => {
+    const rect = svg.getBoundingClientRect();
+
+    const viewBox = svg.viewBox.baseVal;
+    const vbWidth = viewBox.width;
+    const vbHeight = viewBox.height;
+
+    const scale = Math.min(
+        rect.width / vbWidth,
+        rect.height / vbHeight
+    );
+
+    const visibleWidth = rect.width / scale;
+
+    const offsetX = (vbWidth - visibleWidth) / 2;
+
+    return offsetX;
 }

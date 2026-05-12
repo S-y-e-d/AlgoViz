@@ -2,9 +2,10 @@ import { useEffect, useRef, type RefObject } from "react"
 import gsap from "gsap";
 import SeekIcon from "../../assets/seek-icon.svg?react"
 import { Button } from "../Button/Button";
-import type { AlgorithmParams, AlgoType, DataItem, NodeGroup, StructureType } from "../../App";
+import type { AlgorithmParams, AlgoType, arrayAlgoType, DataItem, listAlgoType, NodeGroup, StructureType, treeAlgoType } from "../../App";
 import { arrayAnimBuilder } from "../../animations/array";
 import { listAnimBuilder } from "../../animations/list";
+import { treeAnimBuilder } from "../../animations/trees";
 
 type BottomBarProps = {
   data: DataItem[];
@@ -67,9 +68,11 @@ export function BottomBar({
   useEffect(() => {
     tlRef.current?.pause(0);
     tlRef.current = null;
+        setTLPaused(true);
 
     tlPlayAnimateRef.current?.play();
-  }, [data])
+  }, [data, structure, algorithm, setTLPaused])
+
 
   const setAlgorhtm = () => {
     let tl = null;
@@ -89,13 +92,20 @@ export function BottomBar({
       isTLPaused: isTLPaused,
     }
 
+
     switch (structure) {
       case "array":
-        tl = arrayAnimBuilder[algorithm](algorithmParams);
+        tl = arrayAnimBuilder[algorithm as arrayAlgoType](algorithmParams);
         break;
       case "list":
-        tl = listAnimBuilder[algorithm](algorithmParams);
+        tl = listAnimBuilder[algorithm as listAlgoType](algorithmParams);
         break;
+      case "tree":
+        algorithmParams.array = data;
+        tl = treeAnimBuilder[algorithm as treeAlgoType](algorithmParams);
+        break;
+      default:
+        tl = null;
     }
     tlRef.current = tl;
 

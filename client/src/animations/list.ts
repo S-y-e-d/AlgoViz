@@ -1,12 +1,17 @@
 import gsap from "gsap";
-import { connectNodesTL, createNewListNode, highlightNextTL, highlightNodeTL, MissingElementError, moveNodeTL, adjustListInsertionTL, deleteNodeListTL, adjustListDeletionTL } from "./helper";
+import {
+    connectNodesTL,
+    createNewListNode,
+    highlightNextTL,
+    highlightNodeTL,
+    MissingElementError,
+    moveNodeTL,
+    adjustListInsertionTL,
+    deleteNodeListTL,
+    adjustListDeletionTL,
+    verifyParam
+} from "./helper";
 import type { AlgorithmParams, ColorType } from "../App";
-
-const verifyParam = (param: number | undefined) => {
-    if (param === undefined)
-        throw new Error("Missing parameter");
-    return param;
-}
 
 const insertListTL = (
     { array, value, index, getNode, getEdge, isTLPaused }: AlgorithmParams,
@@ -95,10 +100,4 @@ const deletionListTL = (
 export const listAnimBuilder = {
     insertion: insertListTL,
     deletion: deletionListTL,
-    linearSearch: () => null,
-    binarySearch: () => null,
-    bubbleSort: () => null,
-    selectionSort: () => null,
-    insertionSort: () => null,
-    mergeSort: () => null,
 }

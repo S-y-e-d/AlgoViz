@@ -83,8 +83,8 @@ export function LeftPanel({
     const randomizeData = () => {
 
         let arr;
-        const min =  structure === "array" ? 5 : 3;
-        const max = structure === "array" ? 15 : 8;
+        const min = structure === "array" ? 5 : 3;
+        const max = structure === "list" ? 8 : 15;
         ;
         const size = randomizeSize === 0
             ? Math.floor(Math.random() * (max - min + 1)) + min
@@ -117,6 +117,37 @@ export function LeftPanel({
         onDataChange([]);
     }
 
+
+    let options: { val: string, text: string }[] = [{ val: "NULL", text: "NULL" }];
+    if (structure === "array") {
+        options = [
+            { val: "insertion", text: "Insertion" },
+            { val: "deletion", text: "Deletion" },
+            { val: "linearSearch", text: "Linear Search" },
+            { val: "binarySearch", text: "Binary Search" },
+            { val: "bubble Sort", text: "Bubble Sort" },
+            { val: "selectionSort", text: "Selection Sort" },
+            { val: "insertionSort", text: "Insertion Sort" },
+            { val: "mergeSort", text: "Merge Sort" },
+        ]
+    } else if (structure === "list") {
+
+        options = [
+            { val: "insertion", text: "Insertion" },
+            { val: "deletion", text: "Deletion" },
+        ]
+    } else if (structure === "tree") {
+        options = [
+            { val: "preorder", text: "Preorder Traversal" },
+            { val: "inorder", text: "Inorder Traversal" },
+            { val: "postorder", text: "Postorder Traversal" },
+        ]
+    } else {
+        options = [{ val: "NULL", text: "NULL" }];
+    }
+
+
+
     return (
         <div id="left-panel" className="panel">
             <div className="bar panel-bar" id="left-panel-bar">Controls</div>
@@ -126,7 +157,15 @@ export function LeftPanel({
                     id="struct-select"
                     className="dropdown"
                     value={structure}
-                    onChange={(e) => setStructure(e.target.value as StructureType)}>
+                    onChange={(e) => {
+                        setStructure(e.target.value as StructureType);
+                        setAlgorithm("");
+
+                        onDataChange(dataInput.split(",")
+                            .map(v => parseInt(v.trim())));
+
+
+                    }}>
                     <option value="array">Array</option>
                     <option value="list">Linked List</option>
                     <option value="stack" disabled>Stack</option>
@@ -139,16 +178,21 @@ export function LeftPanel({
                     id="algo-select"
                     className="dropdown"
                     value={algorithm}
-                    onChange={(e) => setAlgorithm(e.target.value as AlgoType)}
+                    onChange={(e) => {
+                        setAlgorithm(e.target.value as AlgoType)
+                        onDataChange(dataInput.split(",")
+                            .map(v => parseInt(v.trim())));
+                    }
+                    }
                 >
-                    <option value="insertion">Insertion</option>
-                    <option value="deletion">Deletion</option>
-                    <option value="linearSearch">Linear Search</option>
-                    <option value="binarySearch">Binary Search</option>
-                    <option value="bubbleSort">Bubble Sort</option>
-                    <option value="selectionSort">Selection Sort</option>
-                    <option value="insertionSort">Insertion Sort</option>
-                    <option value="mergeSort">Merge Sort</option>
+                    <option value="" disabled hidden>
+                        Select an algorithm
+                    </option>
+                    {
+                        options.map((obj) => (
+                            <option key={obj.val} value={obj.val} >{obj.text}</option>
+                        ))
+                    }
                 </select>
 
                 <hr />

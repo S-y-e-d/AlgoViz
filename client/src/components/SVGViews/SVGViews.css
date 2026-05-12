@@ -1,7 +1,7 @@
 #center-panel svg rect,circle {
-    fill: none;
+    fill: var(--bg-layout);
     stroke: var(--svg-stroke);
-    stroke-width: 2px;
+    stroke-width: 4px;
 }
 
 #center-panel svg line,marker {

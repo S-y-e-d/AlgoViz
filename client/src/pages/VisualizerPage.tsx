@@ -41,7 +41,7 @@ export const VisualizerPage = () => {
 
   // Input to select the structure
   const [structure, setStructure] = useState<StructureType>("list");
-  const [algorithm, setAlgoritm] = useState<AlgoType>("insertion");
+  const [algorithm, setAlgoritm] = useState<AlgoType>("");
 
 
   const nodeRefs = useRef<Map<number, NodeGroup>>(new Map());

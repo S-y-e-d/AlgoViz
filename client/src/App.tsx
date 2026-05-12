@@ -3,15 +3,22 @@ import { VisualizerPage } from "./pages/VisualizerPage";
 import { HomePage } from "./pages/HomePage";
 
 export type StructureType = "array" | "list" | "tree";
-export type AlgoType =
-  "insertion"
-  | "deletion"
+export type listAlgoType = "insertion" | "deletion";
+export type arrayAlgoType =
+  listAlgoType
   | "binarySearch"
   | "linearSearch"
   | "bubbleSort"
   | "insertionSort"
   | "selectionSort"
   | "mergeSort";
+
+export type treeAlgoType =
+  "preorder"
+  | "inorder"
+  | "postorder";
+
+export type AlgoType = "" | listAlgoType | arrayAlgoType | treeAlgoType;
 
 export type GetNodeByIndex = (index: number) => SVGGElement | null;
 export type GetEdgeByIndex = (index: number) => SVGLineElement | null;
@@ -39,9 +46,9 @@ export type AlgorithmParams = {
   isTLPaused: React.RefObject<boolean>;
 }
 
-export type ColorType = "yellow" | "orange" | "red" | "green" | "blue";
+export type ColorType = "yellow" | "orange" | "red" | "green" | "blue" | "lime";
 
-export type NodeGroup = {node: SVGGElement | null, edge: SVGLineElement | null};
+export type NodeGroup = { node: SVGGElement | null, edge: SVGLineElement | null };
 
 function App() {
   return (

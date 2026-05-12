@@ -6,7 +6,7 @@ const left = (current: number) => {
 const right = (current: number) => {
     return current * 2 + 2;
 }
-const parent = (current: number) => {
+const getParent = (current: number) => {
     if (current === 0) return 0;
     return Math.floor((current - 1) / 2)
 }
@@ -69,6 +69,7 @@ function computeXCoordinates(arr: number[], size: number): number[] {
     return x;
 }
 
+// return the start and end point of edges after clipping with the nodes
 function edgeLine(
     px: number,
     py: number,
@@ -88,20 +89,54 @@ function edgeLine(
     const uy = dy / dist;
 
     return {
-        x1: px + ux * r,
-        y1: py + uy * r,
-        x2: cx - ux * r,
-        y2: cy - uy * r,
+        x1: cx - ux * r,
+        y1: cy - uy * r,
+        x2: px + ux * r,
+        y2: py + uy * r,
     };
 }
 
-export const TreeView = ({ size, data }: ViewProps) => {
+export const TreeView = ({ size, data, nodeRefs }: ViewProps) => {
+
     const dataWidth: number[] = new Array(data.length).fill(0);
     const dataValues = data.map(item => item.val);
     getSubTreeWidth(0, dataValues, dataWidth);
     const xPositions = computeXCoordinates(dataValues, size);
     const startX = (1000 - (Math.max(...xPositions) - Math.min(...xPositions))) / 2;
-    const startY = (1000 - (2 * Math.floor(Math.log2(data.length)) - 1) * size) / 2;
+    const startY = (1000 - (2 * Math.floor(Math.log2(data.length))) * size) / 2;
+
+
+
+    const setNodeRef = (index: number, el: SVGGElement | null) => {
+        const existing = nodeRefs.current.get(index);
+        let edge = null;
+        if (existing)
+            edge = existing.edge;
+
+        if (el) {
+            nodeRefs.current.set(index, { node: el, edge: edge });
+        } else {
+            if (existing)
+                existing.node = null;
+            if (!existing?.edge) nodeRefs.current.delete(index);
+        }
+    }
+
+    const setEdgeRef = (index: number, el: SVGLineElement | null) => {
+        const existing = nodeRefs.current.get(index);
+        let node = null;
+        if (existing)
+            node = existing.node;
+
+
+        if (el) {
+            nodeRefs.current.set(index, { node: node, edge: el });
+        } else {
+            if (existing)
+                existing.edge = null;
+            if (!existing?.node) nodeRefs.current.delete(index);
+        }
+    }
 
     return (
         <>
@@ -116,27 +151,34 @@ export const TreeView = ({ size, data }: ViewProps) => {
                     if (isNaN(item.val)) {
                         return;
                     }
-                    const parent2 = parent(index);
-                    const px = startX + xPositions[parent2];
-                    const py = startY + 2 * size * Math.floor(Math.log2(parent2 + 1));
+                    const parent = getParent(index);
+                    const px = startX + xPositions[parent];
+                    const py = startY + 2 * size * Math.floor(Math.log2(parent + 1));
                     const { x1, y1, x2, y2 } = edgeLine(x, y, px, py, size / 2);
-                    console.log(data)
                     return (
-                        <g
-                            key={item.id}
-                            transform={`translate(${x}, ${y})`}
-                        >
-                            <circle r={size / 2} cx={x} cy={y} />
-                            <text
-                                x={x}
-                                y={y}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                                fontSize={fontSize}
+                        <g key={item.id}>
+                            <g
+                                transform={`translate(${x}, ${y})`}
+                                ref={(e) => setNodeRef(index, e)}
                             >
-                                {item.val}
-                            </text>
-                            <line x1={x1} y1={y1} x2={x2} y2={y2} />
+                                <circle r={size / 2} />
+                                <text
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    fontSize={fontSize}
+                                >
+                                    {item.val}
+                                </text>
+                            </g>
+                            <line
+                                ref={(e) => setEdgeRef(index, e)}
+                                opacity={y1===y2 ? 0 : 1}
+                                x1={x1}
+                                y1={y1}
+                                x2={x2}
+                                y2={y2}
+                                markerEnd="url(#arrow)"
+                            />
                         </g>
                     );
                 })

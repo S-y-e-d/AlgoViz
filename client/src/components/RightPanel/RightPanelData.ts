@@ -151,5 +151,38 @@ export const algoInfoMap: AlgoMap = {
                 "Deletion in a linked list is done by updating pointers to skip the target node. Traversal is needed to reach the node before the one being deleted.",
         },
     },
-    tree: {},
+    tree: {
+        inorder: {
+            name: "Inorder Traversal",
+            pseudocode: `1. traverse(left)
+2. visit(node)
+3. traverse(right)`,
+            time: "O(n)",
+            space: "O(h)",
+            description:
+                "Inorder traversal visits nodes in left-root-right order. In a binary search tree, this results in sorted order.",
+        },
+
+        preorder: {
+            name: "Preorder Traversal",
+            pseudocode: `1. visit(node)
+2. traverse(left)
+3. traverse(right)`,
+            time: "O(n)",
+            space: "O(h)",
+            description:
+                "Preorder traversal visits nodes in root-left-right order. It is useful for copying or reconstructing trees.",
+        },
+
+        postorder: {
+            name: "Postorder Traversal",
+            pseudocode: `1. traverse(left)
+2. traverse(right)
+3. visit(node)`,
+            time: "O(n)",
+            space: "O(h)",
+            description:
+                "Postorder traversal visits nodes in left-right-root order. It is commonly used for deleting or evaluating trees.",
+        },
+    }
 };

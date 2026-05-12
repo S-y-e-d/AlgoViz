@@ -80,7 +80,7 @@ export const linearSearchTL = (
     for (let i = 0; i < array.length; i++) {
         const o = highlightArrayTL(getNode(i), "yellow", tl);
         if (array[i].val === value) {
-            compHighlight = highlightArrayTL(getNode(i), "green", tl);
+            compHighlight = highlightArrayTL(getNode(i), "lime", tl);
             break;
         } else {
             compHighlight = highlightArrayTL(getNode(i), "red", tl);
@@ -114,7 +114,7 @@ export const binarySearchTL = (
 
         let found = false;
         if (array[mid].val === value) {
-            compHighlight = highlightArrayTL(getNode(mid), "green", tl);
+            compHighlight = highlightArrayTL(getNode(mid), "lime", tl);
             found = true;
         } else {
             compHighlight = highlightArrayTL(getNode(mid), "red", tl);
@@ -269,7 +269,9 @@ const mergeSplitArray = (
         let movedObj;
         let targetVal;
         const ogColor = highlightTempRectTL(obj1.rect, "yellow", tl);
+        tl.to({}, {duration:0.25});
         highlightTempRectTL(obj2.rect, "orange", tl, "<");
+        tl.to({}, {duration:0.25});
 
 
         if (leftArray[i - left].val <= rightArray[j - mid].val) {
@@ -281,11 +283,12 @@ const mergeSplitArray = (
             targetVal = rightArray[j - mid].val;
             j += 1;
         }
-        const tempColor = highlightTempRectTL(movedObj.rect, "green", tl);
+        tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
+        const tempColor = highlightTempRectTL(movedObj.rect, "lime", tl);
         tl.call(() => { if (isTLPaused.current === true) tl.pause(); })
         highlightTempRectTL(movedObj.rect, tempColor, tl);
-        tl.to({}, { duration: 0.25 });
         moveAndSetText(array, k, targetVal, movedObj.text, trueText, tl, isTLPaused);
+        tl.to({}, { duration: 0.25 });
         highlightTempRectTL(movedObj.rect, ogColor, tl);
         k += 1;
     }
@@ -300,9 +303,9 @@ const mergeSplitArray = (
 
         const ogColor = highlightTempRectTL(cloneArray[i].rect, "yellow", tl);
 
+        highlightTempRectTL(cloneArray[i].rect, ogColor, tl);
         moveAndSetText(array, k, targetVal, clonedText, trueText, tl, isTLPaused);
 
-        highlightTempRectTL(cloneArray[i].rect, ogColor, tl);
         k += 1;
         i += 1;
     }
@@ -316,9 +319,9 @@ const mergeSplitArray = (
 
         const ogColor = highlightTempRectTL(cloneArray[j].rect, "orange", tl);
 
+        highlightTempRectTL(cloneArray[j].rect, ogColor, tl);
         moveAndSetText(array, k, targetVal, clonedText, trueText, tl, isTLPaused);
 
-        highlightTempRectTL(cloneArray[j].rect, ogColor, tl);
         k += 1;
         j += 1;
     }
